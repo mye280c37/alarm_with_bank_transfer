@@ -11,13 +11,11 @@ class _HistoryState extends State<History> {
     Size _size = MediaQuery.of(context).size;
     double _width = _size.width;
     double _height = _size.height;
-    return Scaffold(
-      body:Container(
-        width: _width*0.33,
-        height: _height*0.5,
-        decoration: BoxDecoration(
-          color: Colors.white60,
-        ),
+    return Container(
+      width: _width,
+      height: _height,
+      decoration: BoxDecoration(
+        color: Colors.orangeAccent,
       ),
     );
   }
