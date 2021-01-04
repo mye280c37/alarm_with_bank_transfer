@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'alarm.dart';
+import 'setting.dart';
 import 'history.dart';
 
 void main() {
@@ -13,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primaryColor: Color.fromARGB(255, 202, 194, 186),
+        primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(),
@@ -31,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   final TextStyle tabBarStyle = TextStyle(
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w400,
-      fontSize: 24,
+      fontSize: 21,
       color: Color.fromARGB(255, 202, 194, 186)
   );
 
@@ -46,21 +48,9 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
         body: Center(
           child: TabBarView(
             children: [
-              Container(
-                width: _width,
-                height: _height,
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 35, 37, 43),
-                ),
-              ),
-              Container(
-                width: _width,
-                height: _height,
-                decoration: BoxDecoration(
-                  color: Colors.yellowAccent,
-                ),
-              ),
-              History(),
+              AlarmTab(),
+              SettingTab(),
+              HistoryTab(),
             ],
           ),
         ),
@@ -69,6 +59,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
           child: Container(
             height: _height*0.08,
             child: TabBar(
+              indicatorColor: Color.fromARGB(255, 156, 143, 128),
               tabs: [
                 _tab("Alarm"),
                 _tab("Setting"),
