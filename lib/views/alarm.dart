@@ -125,7 +125,7 @@ class _AlarmTabState extends State<AlarmTab> {
         },
         child: IsChecked[day]? Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.only(left: 2.5, right: 2.5),
+          margin: EdgeInsets.only(left: 5, right: 5),
           decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Color.fromARGB(255, 156, 143, 128)

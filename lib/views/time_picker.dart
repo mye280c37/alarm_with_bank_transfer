@@ -115,7 +115,7 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w800,
       fontSize: 62,
-      color: Color.fromARGB(255, 75, 79, 93)
+      color: Color.fromARGB(255, 75, 79, 93),
   );
   double spacing = 20;
   AlignmentGeometry alignment = Alignment.center;
