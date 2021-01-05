@@ -37,25 +37,15 @@ class _AlarmTabState extends State<AlarmTab> {
             width: _width*0.9,
             height: _height*0.1,
             alignment: Alignment.topRight,
-            child: GestureDetector(
-              onTap: (){
+            child: Switch(
+              onChanged: (bool value) {
                 setState(() {
-                  if(alarm_on){
-                    alarm_on = false;
-                  }else{
-                    alarm_on = true;
-                  }
+                  alarm_on = value;
                 });
-              },
-              child: alarm_on? Icon(
-                Icons.alarm_on,
-                color: Color.fromARGB(255, 237, 234, 231),
-                size: _height*0.05,
-              ): Icon(
-                Icons.alarm_off,
-                color: Color.fromARGB(200, 118, 113, 113),
-                size: _height*0.05,
-              ),
+                },
+              value: alarm_on,
+              activeColor: Color.fromARGB(225, 17, 121, 34),
+              inactiveThumbColor: Color.fromARGB(205, 52, 46, 40),
             ),
           ),
           SizedBox(height: 15,),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'alarm.dart';
-import 'setting.dart';
-import 'history.dart';
+import 'views/alarm.dart';
+import 'views/setting.dart';
+import 'views/history.dart';
 
 void main() {
   runApp(MyApp());
