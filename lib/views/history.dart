@@ -18,7 +18,7 @@ class _HistoryTabState extends State<HistoryTab> {
     fontFamily: "AppleSDGothicNeo",
     fontWeight: FontWeight.w300,
     color: Colors.black,
-    fontSize: 12,
+    fontSize: 14,
   );
 
   final BoxDecoration _tableDecoration = BoxDecoration(
@@ -134,15 +134,15 @@ class _HistoryTabState extends State<HistoryTab> {
         ),
         children: [
           Padding(
-            padding: EdgeInsets.all(3.5),
+            padding: EdgeInsets.only(top:5, bottom: 5),
             child: Text("21-02-04", style: tableDetailStyle, textAlign: TextAlign.center,),
           ),
           Padding(
-            padding: EdgeInsets.all(3.5),
+            padding: EdgeInsets.only(top:5, bottom: 5),
             child: Text("76 sec", style: tableDetailStyle, textAlign: TextAlign.center,),
           ),
           Padding(
-            padding: EdgeInsets.all(3.5),
+            padding: EdgeInsets.only(top:5, bottom: 5),
             child: Text("00,000", style: tableDetailStyle, textAlign: TextAlign.center,),
           ),
         ]

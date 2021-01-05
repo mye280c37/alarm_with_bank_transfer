@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'time_picker.dart';
+
 List<bool> IsChecked = [true, false, false, false, false, false, false,];
 
 class AlarmTab extends StatefulWidget {
@@ -16,6 +18,13 @@ class _AlarmTabState extends State<AlarmTab> {
     double _width = _size.width;
     double _height = _size.height;
 
+    TextStyle clockStyle = TextStyle(
+      fontFamily: "AppleSDGothicNeo",
+      fontWeight: FontWeight.w800,
+      fontSize: 65,
+      color: Color.fromARGB(255, 237, 234, 231),
+    );
+
     return Container(
       width: _width,
       height: _height,
@@ -25,17 +34,42 @@ class _AlarmTabState extends State<AlarmTab> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          SizedBox(height: 15,),
           Container(
             width: _width*0.8,
             height: _height*0.5,
-            decoration: BoxDecoration(
-              color: Colors.white,
-            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children:[
+                TimePickerSpinner(itemHeight: _height*0.15, itemWidth: _width*0.3,),
+                Center(
+                  child: Text(
+                    ":",
+                    style: clockStyle,
+                  ),
+                ),
+                Positioned(
+                  top: _height*0.3+3,
+                  child: Row(
+                    children: [
+                      Center(
+                        child: Text("HOURS", style:clockStyle.copyWith(fontSize: 26)),
+                      ),
+                      Container(
+                        width: _width*0.13,
+                      ),
+                      Center(
+                        child: Text("MINUTES", style:clockStyle.copyWith(fontSize: 25)),
+                      )
+                    ],
+                  ),
+                )
+              ]
+            )
           ),
-          SizedBox(height: 15,),
           Container(
             width: _width*0.9,
-            height: _height*0.1,
+            height: _height*0.07,
             alignment: Alignment.topRight,
             child: Switch(
               onChanged: (bool value) {
