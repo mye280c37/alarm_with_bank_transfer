@@ -1,17 +1,26 @@
+import 'package:alarm_with_bank_transfer/alarm_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+import 'package:intl/intl.dart';
+
+import '../models/alarm_model.dart';
 
 
 List<bool> IsChecked = [true, false, false, false, false, false, false,];
 
 class AlarmTab extends StatefulWidget {
+  DateTime alarm;
+
+  AlarmTab({@required this.alarm});
+
   @override
   _AlarmTabState createState() => _AlarmTabState();
 }
 
 class _AlarmTabState extends State<AlarmTab> {
   bool alarm_on = true;
-  DateTime _dateTime;
+  DateTime _alarm;
+  String _targetTime;
 
   // ignore: non_constant_identifier_names
   @override
@@ -45,7 +54,11 @@ class _AlarmTabState extends State<AlarmTab> {
               child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    timePickerSpinner(),
+                    Wrap(
+                      children: [
+                        timePickerSpinner(),
+                      ],
+                    ),
                     Center(
                       child: Text(
                         ":",
@@ -61,7 +74,7 @@ class _AlarmTabState extends State<AlarmTab> {
                                 style: clockStyle.copyWith(fontSize: 26)),
                           ),
                           Container(
-                            width: _width * 0.13,
+                            width: _width * 0.1,
                           ),
                           Center(
                             child: Text("MINUTES",
@@ -161,13 +174,13 @@ class _AlarmTabState extends State<AlarmTab> {
     TextStyle highlightTextStyle = new TextStyle(
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w800,
-      fontSize: 67,
-      color: Color.fromARGB(255, 237, 234, 231),
+      fontSize: 78,
+      color: Color.fromARGB(255, 250, 249, 248),
     );
     TextStyle normalTextStyle = new TextStyle(
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w800,
-      fontSize: 62,
+      fontSize: 75,
       color: Color.fromARGB(255, 75, 79, 93),
     );
 
@@ -178,6 +191,7 @@ class _AlarmTabState extends State<AlarmTab> {
     double _height = _size.height;
 
     return new TimePickerSpinner(
+      time: widget.alarm,
       normalTextStyle: normalTextStyle,
       highlightedTextStyle: highlightTextStyle,
       alignment: Alignment.center,
@@ -186,8 +200,8 @@ class _AlarmTabState extends State<AlarmTab> {
       isForce2Digits: true,
       onTimeChange: (time) {
         setState(() {
-          _dateTime = time;
-          print("new Date Time: ${_dateTime}");
+          _alarm = time;
+          print("new Date Time: ${_alarm}");
         });
       },
     );

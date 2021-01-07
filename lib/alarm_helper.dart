@@ -6,7 +6,7 @@ import 'package:path/path.dart';
 
 import 'models/alarm_model.dart';
 
-final String tableName = 'Alarm';
+final String tableName = 'AlarmTable';
 
 class AlarmHelper {
 
@@ -25,26 +25,13 @@ class AlarmHelper {
 
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, 'MyAlarmDB.db');
+    String path = join(documentsDirectory.path, 'alarmappDB.db');
 
     return await openDatabase(
         path,
         version: 1,
         onCreate: (db, version) async {
-          await db.execute('''
-          CREATE TABLE $tableName(
-            id INTEGER PRIMARY KEY,
-            alarmDateTime TEXT, 
-            isPending INTEGER,
-            mon INTEGER,
-            tue INTEGER,
-            wed INTEGER,
-            thu INTEGER,
-            fri INTEGER,
-            sat INTEGER,
-            sun INTEGER,
-          )
-        ''');
+          await db.execute( 'CREATE TABLE IF NOT EXISTS $tableName(id INTEGER PRIMARY KEY, alarmDateTime TEXT, isPending INTEGER, mon INTEGER, tue INTEGER, wed INTEGER, thu INTEGER, fri INTEGER, sat INTEGER, sun INTEGER)');
         },
     );
   }
@@ -58,8 +45,13 @@ class AlarmHelper {
 
   // READ
   getAlarm(int id) async {
+    print("getAlarm");
     final db = await database;
+    print("load db");
     var res = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
+    print("find ${id}");
+    print("res: {$res}");
+    print(res.isEmpty);
     return res.isNotEmpty ? Alarm.fromMap(res.first) : Null;
   }
 
@@ -69,6 +61,7 @@ class AlarmHelper {
     var res = await db.query(tableName);
     List<Alarm> list =
       res.isNotEmpty ? res.map((c) => Alarm.fromMap(c)).toList() : [];
+    print("list: ${list}");
     return list;
   }
 

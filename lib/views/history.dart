@@ -16,7 +16,7 @@ class _HistoryTabState extends State<HistoryTab> {
 
   final tableDetailStyle = TextStyle(
     fontFamily: "AppleSDGothicNeo",
-    fontWeight: FontWeight.w300,
+    fontWeight: FontWeight.w400,
     color: Colors.black,
     fontSize: 14,
   );
@@ -28,7 +28,7 @@ class _HistoryTabState extends State<HistoryTab> {
           end: Alignment(0.8, 0.0),
           colors: [
             Color.fromARGB(255, 202, 194, 186),
-            Color.fromARGB(255, 237, 234, 231),
+            Colors.white,
           ]),
       boxShadow: [
         BoxShadow(

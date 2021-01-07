@@ -25,7 +25,7 @@ class HistoryHelper {
 
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, 'MyAlarmDB.db');
+    String path = join(documentsDirectory.path, 'HistoryDB.db');
 
     return await openDatabase(
         path,

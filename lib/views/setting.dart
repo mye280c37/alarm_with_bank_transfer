@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'turn_off.dart';
+
 class SettingTab extends StatefulWidget {
   @override
   _SettingTabState createState() => _SettingTabState();
@@ -27,7 +29,7 @@ class _SettingTabState extends State<SettingTab> {
           begin: Alignment.topLeft,
           end: Alignment.topRight,
           colors: [
-            Color.fromARGB(255, 237, 234, 231),
+            Colors.white,
             Color.fromARGB(255, 202, 194, 186)
           ]),
       boxShadow: [
@@ -115,6 +117,26 @@ class _SettingTabState extends State<SettingTab> {
               ),
             ),
           ),
+          GestureDetector(
+            onTap: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder:(context)=>TurnOff(targetTime: "10:13",)));
+            },
+            child: Container(
+              width: _width*0.9,
+              height: _height*0.09,
+              margin: EdgeInsets.only(bottom: 20),
+              padding: EdgeInsets.only(right: 20),
+              alignment: Alignment.centerRight,
+              decoration: _menuDecoration,
+              child: Text(
+                "TurnOff",
+                textAlign: TextAlign.right,
+                style: menuStyle,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -141,7 +163,7 @@ class _DetailViewState extends State<DetailView> {
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w400,
       fontSize: 21,
-      color: Color.fromARGB(255, 202, 194, 186),
+      color: Color.fromARGB(255, 250, 249, 248),
       shadows: [
         Shadow(
           blurRadius: 5.0,
@@ -189,7 +211,7 @@ class _DetailViewState extends State<DetailView> {
             begin: Alignment.topLeft,
             end: Alignment.topRight,
             colors: [
-              Color.fromARGB(255, 237, 234, 231),
+              Colors.white,
               Color.fromARGB(255, 202, 194, 186)
             ]),
         boxShadow: [
