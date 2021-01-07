@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 
-import 'time_picker.dart';
 
 List<bool> IsChecked = [true, false, false, false, false, false, false,];
 
@@ -11,10 +11,14 @@ class AlarmTab extends StatefulWidget {
 
 class _AlarmTabState extends State<AlarmTab> {
   bool alarm_on = true;
+  DateTime _dateTime;
+
   // ignore: non_constant_identifier_names
   @override
   Widget build(BuildContext context) {
-    Size _size = MediaQuery.of(context).size;
+    Size _size = MediaQuery
+        .of(context)
+        .size;
     double _width = _size.width;
     double _height = _size.height;
 
@@ -36,47 +40,49 @@ class _AlarmTabState extends State<AlarmTab> {
         children: [
           SizedBox(height: 15,),
           Container(
-            width: _width*0.8,
-            height: _height*0.5,
-            child: Stack(
-              alignment: Alignment.center,
-              children:[
-                TimePickerSpinner(itemHeight: _height*0.15, itemWidth: _width*0.3,),
-                Center(
-                  child: Text(
-                    ":",
-                    style: clockStyle,
-                  ),
-                ),
-                Positioned(
-                  top: _height*0.3+3,
-                  child: Row(
-                    children: [
-                      Center(
-                        child: Text("HOURS", style:clockStyle.copyWith(fontSize: 26)),
+              width: _width * 0.9,
+              height: _height * 0.5,
+              child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    timePickerSpinner(),
+                    Center(
+                      child: Text(
+                        ":",
+                        style: clockStyle,
                       ),
-                      Container(
-                        width: _width*0.13,
+                    ),
+                    Positioned(
+                      top: _height * 0.3 + 3,
+                      child: Row(
+                        children: [
+                          Center(
+                            child: Text("HOURS",
+                                style: clockStyle.copyWith(fontSize: 26)),
+                          ),
+                          Container(
+                            width: _width * 0.13,
+                          ),
+                          Center(
+                            child: Text("MINUTES",
+                                style: clockStyle.copyWith(fontSize: 25)),
+                          )
+                        ],
                       ),
-                      Center(
-                        child: Text("MINUTES", style:clockStyle.copyWith(fontSize: 25)),
-                      )
-                    ],
-                  ),
-                )
-              ]
-            )
+                    )
+                  ]
+              )
           ),
           Container(
-            width: _width*0.9,
-            height: _height*0.07,
+            width: _width * 0.9,
+            height: _height * 0.07,
             alignment: Alignment.topRight,
             child: Switch(
               onChanged: (bool value) {
                 setState(() {
                   alarm_on = value;
                 });
-                },
+              },
               value: alarm_on,
               activeColor: Color.fromARGB(225, 17, 121, 34),
               inactiveThumbColor: Color.fromARGB(205, 52, 46, 40),
@@ -84,8 +90,8 @@ class _AlarmTabState extends State<AlarmTab> {
           ),
           SizedBox(height: 15,),
           Container(
-            width: _width*0.95,
-            height: _height*0.1,
+            width: _width * 0.95,
+            height: _height * 0.1,
             child: Row(
               children: [
                 _day("S", 0),
@@ -103,7 +109,7 @@ class _AlarmTabState extends State<AlarmTab> {
     );
   }
 
-  Widget _day(String name, int day){
+  Widget _day(String name, int day) {
     Color _checkedColor = Color.fromARGB(255, 237, 234, 231);
     TextStyle _textstyle = TextStyle(
         fontFamily: "AppleSDGothicNeo",
@@ -113,17 +119,17 @@ class _AlarmTabState extends State<AlarmTab> {
     );
     return Expanded(
       child: GestureDetector(
-        onTap: (){
+        onTap: () {
           setState(() {
             print("ontap");
-            if(IsChecked[day]){
+            if (IsChecked[day]) {
               IsChecked[day] = false;
-            }else{
+            } else {
               IsChecked[day] = true;
             }
           });
         },
-        child: IsChecked[day]? Container(
+        child: IsChecked[day] ? Container(
           alignment: Alignment.center,
           margin: EdgeInsets.only(left: 5, right: 5),
           decoration: BoxDecoration(
@@ -134,7 +140,7 @@ class _AlarmTabState extends State<AlarmTab> {
             name,
             style: _textstyle.copyWith(color: _checkedColor),
           ),
-        ): Container(
+        ) : Container(
           alignment: Alignment.center,
           margin: EdgeInsets.only(left: 2.5, right: 2.5),
           decoration: BoxDecoration(
@@ -148,6 +154,42 @@ class _AlarmTabState extends State<AlarmTab> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget timePickerSpinner() {
+    TextStyle highlightTextStyle = new TextStyle(
+      fontFamily: "AppleSDGothicNeo",
+      fontWeight: FontWeight.w800,
+      fontSize: 67,
+      color: Color.fromARGB(255, 237, 234, 231),
+    );
+    TextStyle normalTextStyle = new TextStyle(
+      fontFamily: "AppleSDGothicNeo",
+      fontWeight: FontWeight.w800,
+      fontSize: 62,
+      color: Color.fromARGB(255, 75, 79, 93),
+    );
+
+    Size _size = MediaQuery
+        .of(context)
+        .size;
+    double _width = _size.width;
+    double _height = _size.height;
+
+    return new TimePickerSpinner(
+      normalTextStyle: normalTextStyle,
+      highlightedTextStyle: highlightTextStyle,
+      alignment: Alignment.center,
+      itemHeight: _height * 0.15,
+      itemWidth: _width*0.3,
+      isForce2Digits: true,
+      onTimeChange: (time) {
+        setState(() {
+          _dateTime = time;
+          print("new Date Time: ${_dateTime}");
+        });
+      },
     );
   }
 }
