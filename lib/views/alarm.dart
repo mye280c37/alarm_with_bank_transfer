@@ -1,35 +1,48 @@
-import 'package:alarm_with_bank_transfer/alarm_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:intl/intl.dart';
 
 import '../models/alarm_model.dart';
+import '../alarm_helper.dart';
 
-
-List<bool> IsChecked = [true, false, false, false, false, false, false,];
+List<bool> IsChecked = [
+  true,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+];
 
 class AlarmTab extends StatefulWidget {
   DateTime alarm;
+  bool alarmOn;
+  bool doesExist;
 
-  AlarmTab({@required this.alarm});
+  AlarmTab(
+      {@required this.alarm, @required this.alarmOn, @required this.doesExist});
 
   @override
-  _AlarmTabState createState() => _AlarmTabState();
+  _AlarmTabState createState() => _AlarmTabState(alarm, alarmOn);
 }
 
 class _AlarmTabState extends State<AlarmTab> {
-  bool alarm_on = true;
   DateTime _alarm;
   String _targetTime;
+  bool _alarmOn;
+
+  _AlarmTabState(this._alarm, this._alarmOn);
 
   // ignore: non_constant_identifier_names
   @override
   Widget build(BuildContext context) {
-    Size _size = MediaQuery
-        .of(context)
-        .size;
+    Size _size = MediaQuery.of(context).size;
     double _width = _size.width;
     double _height = _size.height;
+
+    print("alarmOn? ${_alarmOn}");
+    print("_alarm: ${_alarm}");
 
     TextStyle clockStyle = TextStyle(
       fontFamily: "AppleSDGothicNeo",
@@ -47,45 +60,43 @@ class _AlarmTabState extends State<AlarmTab> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 15,),
+          SizedBox(
+            height: 15,
+          ),
           Container(
               width: _width * 0.9,
               height: _height * 0.5,
-              child: Stack(
-                  alignment: Alignment.center,
+              child: Stack(alignment: Alignment.center, children: [
+                Wrap(
                   children: [
-                    Wrap(
-                      children: [
-                        timePickerSpinner(),
-                      ],
-                    ),
-                    Center(
-                      child: Text(
-                        ":",
-                        style: clockStyle,
+                    timePickerSpinner(),
+                  ],
+                ),
+                Center(
+                  child: Text(
+                    ":",
+                    style: clockStyle,
+                  ),
+                ),
+                Positioned(
+                  top: _height * 0.3 + 3,
+                  child: Row(
+                    children: [
+                      Center(
+                        child: Text("HOURS",
+                            style: clockStyle.copyWith(fontSize: 26)),
                       ),
-                    ),
-                    Positioned(
-                      top: _height * 0.3 + 3,
-                      child: Row(
-                        children: [
-                          Center(
-                            child: Text("HOURS",
-                                style: clockStyle.copyWith(fontSize: 26)),
-                          ),
-                          Container(
-                            width: _width * 0.1,
-                          ),
-                          Center(
-                            child: Text("MINUTES",
-                                style: clockStyle.copyWith(fontSize: 25)),
-                          )
-                        ],
+                      Container(
+                        width: _width * 0.1,
                       ),
-                    )
-                  ]
-              )
-          ),
+                      Center(
+                        child: Text("MINUTES",
+                            style: clockStyle.copyWith(fontSize: 25)),
+                      )
+                    ],
+                  ),
+                )
+              ])),
           Container(
             width: _width * 0.9,
             height: _height * 0.07,
@@ -93,15 +104,17 @@ class _AlarmTabState extends State<AlarmTab> {
             child: Switch(
               onChanged: (bool value) {
                 setState(() {
-                  alarm_on = value;
+                  widget.alarmOn = value;
                 });
               },
-              value: alarm_on,
+              value: widget.alarmOn,
               activeColor: Color.fromARGB(225, 17, 121, 34),
               inactiveThumbColor: Color.fromARGB(205, 52, 46, 40),
             ),
           ),
-          SizedBox(height: 15,),
+          SizedBox(
+            height: 15,
+          ),
           Container(
             width: _width * 0.95,
             height: _height * 0.1,
@@ -128,8 +141,7 @@ class _AlarmTabState extends State<AlarmTab> {
         fontFamily: "AppleSDGothicNeo",
         fontWeight: FontWeight.w400,
         fontSize: 24,
-        color: Color.fromARGB(255, 202, 194, 186)
-    );
+        color: Color.fromARGB(255, 202, 194, 186));
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -142,30 +154,31 @@ class _AlarmTabState extends State<AlarmTab> {
             }
           });
         },
-        child: IsChecked[day] ? Container(
-          alignment: Alignment.center,
-          margin: EdgeInsets.only(left: 5, right: 5),
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color.fromARGB(255, 156, 143, 128)
-          ),
-          child: Text(
-            name,
-            style: _textstyle.copyWith(color: _checkedColor),
-          ),
-        ) : Container(
-          alignment: Alignment.center,
-          margin: EdgeInsets.only(left: 2.5, right: 2.5),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Color.fromARGB(255, 156, 143, 128)),
-            color: Color.fromARGB(255, 35, 37, 43),
-          ),
-          child: Text(
-            name,
-            style: _textstyle,
-          ),
-        ),
+        child: IsChecked[day]
+            ? Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.only(left: 5, right: 5),
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color.fromARGB(255, 156, 143, 128)),
+                child: Text(
+                  name,
+                  style: _textstyle.copyWith(color: _checkedColor),
+                ),
+              )
+            : Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.only(left: 2.5, right: 2.5),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Color.fromARGB(255, 156, 143, 128)),
+                  color: Color.fromARGB(255, 35, 37, 43),
+                ),
+                child: Text(
+                  name,
+                  style: _textstyle,
+                ),
+              ),
       ),
     );
   }
@@ -184,25 +197,54 @@ class _AlarmTabState extends State<AlarmTab> {
       color: Color.fromARGB(255, 75, 79, 93),
     );
 
-    Size _size = MediaQuery
-        .of(context)
-        .size;
+    Size _size = MediaQuery.of(context).size;
     double _width = _size.width;
     double _height = _size.height;
 
     return new TimePickerSpinner(
-      time: widget.alarm,
+      time: _alarm,
       normalTextStyle: normalTextStyle,
       highlightedTextStyle: highlightTextStyle,
       alignment: Alignment.center,
       itemHeight: _height * 0.15,
-      itemWidth: _width*0.3,
+      itemWidth: _width * 0.3,
       isForce2Digits: true,
       onTimeChange: (time) {
+        if (widget.doesExist) {
+          // create alarm
+          Alarm newAlarm = Alarm(
+            id: 0,
+            alarmDateTime: time,
+            isPending: _alarmOn,
+            mon: IsChecked[0],
+            tue: IsChecked[1],
+            wed: IsChecked[2],
+            thu: IsChecked[3],
+            fri: IsChecked[4],
+            sat: IsChecked[5],
+            sun: IsChecked[6],
+          );
+          AlarmHelper().createAlarm(newAlarm);
+        } else {
+          // update alarm
+          Alarm updateAlarm = Alarm(
+            id: 0,
+            alarmDateTime: time,
+            isPending: _alarmOn,
+            mon: IsChecked[0],
+            tue: IsChecked[1],
+            wed: IsChecked[2],
+            thu: IsChecked[3],
+            fri: IsChecked[4],
+            sat: IsChecked[5],
+            sun: IsChecked[6],
+          );
+          AlarmHelper().updateAlarm(updateAlarm);
+        }
         setState(() {
           _alarm = time;
-          print("new Date Time: ${_alarm}");
         });
+        print("new Date Time: ${_alarm}");
       },
     );
   }

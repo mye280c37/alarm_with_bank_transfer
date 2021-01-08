@@ -9,7 +9,6 @@ import 'models/alarm_model.dart';
 final String tableName = 'AlarmTable';
 
 class AlarmHelper {
-
   AlarmHelper._();
   static final AlarmHelper _db = AlarmHelper._();
   factory AlarmHelper() => _db;
@@ -17,7 +16,7 @@ class AlarmHelper {
   static Database _database;
 
   Future<Database> get database async {
-    if(_database != null) return _database;
+    if (_database != null) return _database;
 
     _database = await initDB();
     return _database;
@@ -28,11 +27,12 @@ class AlarmHelper {
     String path = join(documentsDirectory.path, 'alarmappDB.db');
 
     return await openDatabase(
-        path,
-        version: 1,
-        onCreate: (db, version) async {
-          await db.execute( 'CREATE TABLE IF NOT EXISTS $tableName(id INTEGER PRIMARY KEY, alarmDateTime TEXT, isPending INTEGER, mon INTEGER, tue INTEGER, wed INTEGER, thu INTEGER, fri INTEGER, sat INTEGER, sun INTEGER)');
-        },
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute(
+            'CREATE TABLE IF NOT EXISTS $tableName(id INTEGER PRIMARY KEY, alarmDateTime TEXT, isPending INTEGER, mon INTEGER, tue INTEGER, wed INTEGER, thu INTEGER, fri INTEGER, sat INTEGER, sun INTEGER)');
+      },
     );
   }
 
@@ -40,6 +40,7 @@ class AlarmHelper {
   createAlarm(Alarm alarm) async {
     final db = await database;
     var res = await db.insert(tableName, alarm.toMap());
+    print("createAlarm");
     return res;
   }
 
@@ -51,7 +52,7 @@ class AlarmHelper {
     var res = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
     print("find ${id}");
     print("res: {$res}");
-    print(res.isEmpty);
+    print("isEmpty? ${res.isEmpty}");
     return res.isNotEmpty ? Alarm.fromMap(res.first) : Null;
   }
 
@@ -60,7 +61,7 @@ class AlarmHelper {
     final db = await database;
     var res = await db.query(tableName);
     List<Alarm> list =
-      res.isNotEmpty ? res.map((c) => Alarm.fromMap(c)).toList() : [];
+        res.isNotEmpty ? res.map((c) => Alarm.fromMap(c)).toList() : [];
     print("list: ${list}");
     return list;
   }
@@ -68,7 +69,9 @@ class AlarmHelper {
   // Update Alarm
   updateAlarm(Alarm alarm) async {
     final db = await database;
-    var res = await db.update(tableName, alarm.toMap(), where: 'id = ?', whereArgs: [alarm.id]);
+    var res = await db.update(tableName, alarm.toMap(),
+        where: 'id = ?', whereArgs: [alarm.id]);
+    print("updateAlarm");
     return res;
   }
 
@@ -83,5 +86,4 @@ class AlarmHelper {
     final db = await database;
     db.rawDelete('Delete * from $tableName');
   }
-
 }

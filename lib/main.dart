@@ -33,33 +33,37 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   var _alarm;
   DateTime _time = DateTime.now();
   AlarmHelper _alarmHelper = AlarmHelper();
   String _targetTime;
+  bool _alarmOn = false;
+  bool _doesExist = false;
 
   final TextStyle tabBarStyle = TextStyle(
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w400,
       fontSize: 21,
-      color: Color.fromARGB(255, 202, 194, 186)
-  );
+      color: Color.fromARGB(255, 202, 194, 186));
 
   @override
-  void initState(){
-   _alarmHelper.database.then((value){
-     print("----------initialize database");
-     loadData();
-   });
-   super.initState();
+  void initState() {
+    _alarmHelper.database.then((value) {
+      print("----------initialize database");
+      loadData();
+    });
+    super.initState();
   }
-  void loadData() {
+
+  Future<dynamic> loadData() async {
     print("load alarm");
     _alarm = _alarmHelper.getAlarm(0);
     print("finish alarm");
     print("_alarm: ${_alarm}");
     if (mounted) setState(() {});
+    return _alarm;
   }
 
   @override
@@ -69,15 +73,32 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     double _height = _size.height;
 
     return FutureBuilder(
-      future: _alarm,
-      builder: (context, snapshot){
-        if(snapshot.hasData){
-          return DefaultTabController(length: 3,
-            child:Scaffold(
+      future: loadData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          print("snapshot: ${snapshot.data}");
+          if (snapshot.data == Null) {
+            print("snapshot is null");
+            _time = DateTime.now();
+          } else {
+            _time = snapshot.data;
+            print("snaphot_data: ${snapshot.data}");
+            _alarmOn = true;
+            _doesExist = true;
+          }
+          _targetTime = DateFormat('Hm').format(_time);
+          print(_targetTime);
+          return DefaultTabController(
+            length: 3,
+            child: Scaffold(
               body: Center(
                 child: TabBarView(
                   children: [
-                    AlarmTab(alarm: _time,),
+                    AlarmTab(
+                      alarm: _time,
+                      alarmOn: _alarmOn,
+                      doesExist: _doesExist,
+                    ),
                     SettingTab(),
                     HistoryTab(),
                   ],
@@ -86,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
               bottomNavigationBar: BottomAppBar(
                 color: Color.fromARGB(255, 35, 37, 43),
                 child: Container(
-                  height: _height*0.08,
+                  height: _height * 0.08,
                   child: TabBar(
                     indicatorColor: Color.fromARGB(255, 156, 143, 128),
                     tabs: [
@@ -99,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
               ),
             ),
           );
-        }else{
+        } else {
           return Center(
             child: CircularProgressIndicator(),
           );
@@ -108,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     );
   }
 
-  Tab _tab(String title){
+  Tab _tab(String title) {
     return Tab(
       child: Text(
         title,
@@ -117,8 +138,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
             fontFamily: "AppleSDGothicNeo",
             fontWeight: FontWeight.w400,
             fontSize: 24,
-            color: Color.fromARGB(255, 202, 194, 186)
-        ),
+            color: Color.fromARGB(255, 202, 194, 186)),
       ),
     );
   }
