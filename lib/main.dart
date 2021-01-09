@@ -49,14 +49,6 @@ class _MyHomePageState extends State<MyHomePage>
       color: Color.fromARGB(255, 202, 194, 186));
 
   @override
-  void initState() {
-    _alarmHelper.database.then((value) {
-      print("----------initialize database");
-    });
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     Size _size = MediaQuery.of(context).size;
     double _width = _size.width;

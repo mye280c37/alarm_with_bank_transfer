@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../models/history_model.dart';
+import '../history_helper.dart';
 
 class HistoryTab extends StatefulWidget {
   @override
@@ -6,11 +10,13 @@ class HistoryTab extends StatefulWidget {
 }
 
 class _HistoryTabState extends State<HistoryTab> {
+  List<History> _allHistory;
+
   final tableTitleStyle = TextStyle(
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w500,
       color: Colors.black,
-      fontSize: 16,
+      fontSize: 18,
       height: 1.8
   );
 
@@ -18,7 +24,7 @@ class _HistoryTabState extends State<HistoryTab> {
     fontFamily: "AppleSDGothicNeo",
     fontWeight: FontWeight.w400,
     color: Colors.black,
-    fontSize: 14,
+    fontSize: 15,
   );
 
   final BoxDecoration _tableDecoration = BoxDecoration(
@@ -40,69 +46,50 @@ class _HistoryTabState extends State<HistoryTab> {
   );
 
   @override
+  void initState() {
+    HistoryHelper().database.then((value) {
+      print("----------initialize history database");
+    });
+    super.initState();
+  }
+
+  Future<int> loadHistory() async {
+    print("load all history");
+    print(DateFormat('yy-MM-dd').format(DateTime.now()));
+    _allHistory = await HistoryHelper().getAllHistory();
+    print("_allHistory :${_allHistory}");
+    print(_allHistory.length);
+    return _allHistory.length;
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size _size = MediaQuery.of(context).size;
     double _width = _size.width;
     double _height = _size.height;
-    return Container(
-      width: _width,
-      height: _height,
-      color: Color.fromARGB(255, 35, 37, 43),
-      padding: EdgeInsets.all(20).copyWith(top: 35),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-              width: _width*0.9,
-              height: _height*0.8,
-              decoration: _tableDecoration,
-              padding: EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: _height*0.01,
-                  ),
-                  Table(
-                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    columnWidths: {
-                      0: FractionColumnWidth(.27),
-                      1: FractionColumnWidth(.39),
-                      2: FractionColumnWidth(.34),
-                    },
+    return FutureBuilder(
+      future: loadHistory(),
+      builder: (context, snapshot){
+        if(snapshot.hasData){
+          return Container(
+            width: _width,
+            height: _height,
+            color: Color.fromARGB(255, 35, 37, 43),
+            padding: EdgeInsets.all(20).copyWith(top: 35),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: _width*0.9,
+                  height: _height*0.8,
+                  decoration: _tableDecoration,
+                  padding: EdgeInsets.all(10),
+                  child: Column(
                     children: [
-                      // title of each columns
-                      TableRow(
-                        // Title of each Column
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(0, 0, 0, 0),
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Color.fromARGB(255, 35, 37, 43),
-                                style: BorderStyle.solid,
-                              ),
-                            ),
-                          ),
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 1.5),
-                              child: Text("Date", style: tableTitleStyle, textAlign: TextAlign.center,),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 1.5),
-                              child: Text("TimeExceeded", style: tableTitleStyle, textAlign: TextAlign.center,),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(bottom: 1.5),
-                              child: Text("Penalty", style: tableTitleStyle, textAlign: TextAlign.center,),
-                            ),
-                          ]
+                      SizedBox(
+                        height: _height*0.01,
                       ),
-                    ],
-                  ),
-                  Flexible(
-                    child: SingleChildScrollView(
-                      physics: BouncingScrollPhysics(),
-                      child: Table(
+                      Table(
                         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                         columnWidths: {
                           0: FractionColumnWidth(.27),
@@ -110,24 +97,78 @@ class _HistoryTabState extends State<HistoryTab> {
                           2: FractionColumnWidth(.34),
                         },
                         children: [
-                          for(int i=0; i<20; i++)
-                            dataRow(),
+                          // title of each columns
+                          TableRow(
+                            // Title of each Column
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(0, 0, 0, 0),
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Color.fromARGB(255, 35, 37, 43),
+                                    style: BorderStyle.solid,
+                                  ),
+                                ),
+                              ),
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 1.5),
+                                  child: Text("Date", style: tableTitleStyle, textAlign: TextAlign.center,),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 1.5),
+                                  child: Text("TimeExceeded", style: tableTitleStyle, textAlign: TextAlign.center,),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 1.5),
+                                  child: Text("Penalty", style: tableTitleStyle, textAlign: TextAlign.center,),
+                                ),
+                              ]
+                          ),
                         ],
                       ),
-                    ),
+                      Flexible(
+                        child: snapshot.data == 0 ?
+                        Container(
+                          child:Center(
+                            child: Text("there is no history", style: tableDetailStyle),
+                          ) ,
+                        ):SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          child: Table(
+                            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                            columnWidths: {
+                              0: FractionColumnWidth(.27),
+                              1: FractionColumnWidth(.39),
+                              2: FractionColumnWidth(.34),
+                            },
+                            children: [
+                              for(int i=0; i<snapshot.data; i++)
+                                dataRow(i),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: _height*0.01,
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    height: _height*0.01,
-                  ),
-                ],
-              ),
-          ),
-        ],
-      ),
+                ),
+              ],
+            ),
+          );
+        }else{
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 
-  TableRow dataRow(){
+  TableRow dataRow(int i){
+    History history = _allHistory[i];
+    String date = DateFormat('yy-MM-dd').format(history.date);
     return TableRow(
         decoration: BoxDecoration(
             color: Color.fromARGB(0, 0, 0, 0),
@@ -135,15 +176,15 @@ class _HistoryTabState extends State<HistoryTab> {
         children: [
           Padding(
             padding: EdgeInsets.only(top:5, bottom: 5),
-            child: Text("21-02-04", style: tableDetailStyle, textAlign: TextAlign.center,),
+            child: Text(date, style: tableDetailStyle, textAlign: TextAlign.center,),
           ),
           Padding(
             padding: EdgeInsets.only(top:5, bottom: 5),
-            child: Text("76 sec", style: tableDetailStyle, textAlign: TextAlign.center,),
+            child: Text(history.timeExceeded.toString() +" sec", style: tableDetailStyle, textAlign: TextAlign.center,),
           ),
           Padding(
             padding: EdgeInsets.only(top:5, bottom: 5),
-            child: Text("00,000", style: tableDetailStyle, textAlign: TextAlign.center,),
+            child: Text(history.penalty.toString(), style: tableDetailStyle, textAlign: TextAlign.center,),
           ),
         ]
     );

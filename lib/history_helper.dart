@@ -31,14 +31,7 @@ class HistoryHelper {
         path,
         version: 1,
         onCreate: (db, version) async {
-          await db.execute('''
-          CREATE TABLE $tableName(
-            id INTEGER PRIMARY KEY,
-            date TEXT, 
-            timeExceeded INTEGER,
-            penalty INTEGER,
-          )
-        ''');
+          await db.execute('CREATE TABLE IF NOT EXISTS $tableName(id INTEGER PRIMARY KEY, date TEXT, timeExceeded INTEGER, penalty INTEGER)');
         },
     );
   }
