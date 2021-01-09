@@ -1,14 +1,14 @@
 class Alarm {
   int id;
   DateTime alarmDateTime;
-  bool isPending;
-  bool mon;
-  bool tue;
-  bool wed;
-  bool thu;
-  bool fri;
-  bool sat;
-  bool sun;
+  int isPending;
+  int mon;
+  int tue;
+  int wed;
+  int thu;
+  int fri;
+  int sat;
+  int sun;
 
   Alarm({
     this.id,
@@ -23,7 +23,7 @@ class Alarm {
     this.sun
   });
 
-  factory Alarm.fromMap(Map<String, dynamic> json) => Alarm(
+  factory Alarm.fromMap(Map<String, dynamic> json) => new Alarm(
     id: json["id"],
     alarmDateTime: DateTime.parse(json["alarmDateTime"]),
     isPending: json["isPending"],

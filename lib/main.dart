@@ -52,18 +52,8 @@ class _MyHomePageState extends State<MyHomePage>
   void initState() {
     _alarmHelper.database.then((value) {
       print("----------initialize database");
-      loadData();
     });
     super.initState();
-  }
-
-  Future<dynamic> loadData() async {
-    print("load alarm");
-    _alarm = _alarmHelper.getAlarm(0);
-    print("finish alarm");
-    print("_alarm: ${_alarm}");
-    if (mounted) setState(() {});
-    return _alarm;
   }
 
   @override
@@ -72,60 +62,33 @@ class _MyHomePageState extends State<MyHomePage>
     double _width = _size.width;
     double _height = _size.height;
 
-    return FutureBuilder(
-      future: loadData(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          print("snapshot: ${snapshot.data}");
-          if (snapshot.data == Null) {
-            print("snapshot is null");
-            _time = DateTime.now();
-          } else {
-            _time = snapshot.data;
-            print("snaphot_data: ${snapshot.data}");
-            _alarmOn = true;
-            _doesExist = true;
-          }
-          _targetTime = DateFormat('Hm').format(_time);
-          print(_targetTime);
-          return DefaultTabController(
-            length: 3,
-            child: Scaffold(
-              body: Center(
-                child: TabBarView(
-                  children: [
-                    AlarmTab(
-                      alarm: _time,
-                      alarmOn: _alarmOn,
-                      doesExist: _doesExist,
-                    ),
-                    SettingTab(),
-                    HistoryTab(),
-                  ],
-                ),
-              ),
-              bottomNavigationBar: BottomAppBar(
-                color: Color.fromARGB(255, 35, 37, 43),
-                child: Container(
-                  height: _height * 0.08,
-                  child: TabBar(
-                    indicatorColor: Color.fromARGB(255, 156, 143, 128),
-                    tabs: [
-                      _tab("Alarm"),
-                      _tab("Setting"),
-                      _tab("History"),
-                    ],
-                  ),
-                ),
-              ),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        body: Center(
+          child: TabBarView(
+            children: [
+              AlarmTab(),
+              SettingTab(),
+              HistoryTab(),
+            ],
+          ),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Color.fromARGB(255, 35, 37, 43),
+          child: Container(
+            height: _height * 0.08,
+            child: TabBar(
+              indicatorColor: Color.fromARGB(255, 156, 143, 128),
+              tabs: [
+                _tab("Alarm"),
+                _tab("Setting"),
+                _tab("History"),
+              ],
             ),
-          );
-        } else {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
+          ),
+        ),
+      ),
     );
   }
 

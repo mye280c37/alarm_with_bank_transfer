@@ -39,20 +39,19 @@ class AlarmHelper {
   //Create
   createAlarm(Alarm alarm) async {
     final db = await database;
-    var res = await db.insert(tableName, alarm.toMap());
+    var res = await db.insert(
+        tableName,
+        alarm.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,);
     print("createAlarm");
     return res;
   }
 
   // READ
   getAlarm(int id) async {
-    print("getAlarm");
     final db = await database;
-    print("load db");
     var res = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
-    print("find ${id}");
-    print("res: {$res}");
-    print("isEmpty? ${res.isEmpty}");
+    print(res);
     return res.isNotEmpty ? Alarm.fromMap(res.first) : Null;
   }
 
