@@ -27,25 +27,20 @@ class _AlarmTabState extends State<AlarmTab> {
     false,
   ];
 
-  @override
-  void initState() {
-    AlarmHelper().database.then((value) {
-      print("----------initialize alarm database");
-    });
-    super.initState();
-  }
-
   Future<DateTime> loadAlarm() async {
     print("load alarm");
     _alarm = await AlarmHelper().getAlarm(0);
     if(mounted){
-      if (_alarm == Null) {
+      // ignore: unrelated_type_equality_checks
+      if (_alarm.id == -1) {
+        print("alarm is null");
         setState(() {
           _alarmTime = DateTime.now();
           doesExist = false;
           _alarmOn = true;
         });
       } else {
+        print("alarm is not null");
         setState(() {
           _alarmTime = _alarm.alarmDateTime;
           doesExist = true;

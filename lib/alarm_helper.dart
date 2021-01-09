@@ -51,8 +51,20 @@ class AlarmHelper {
   getAlarm(int id) async {
     final db = await database;
     var res = await db.query(tableName, where: 'id = ?', whereArgs: [id]);
-    print(res);
-    return res.isNotEmpty ? Alarm.fromMap(res.first) : Null;
+    print("res: ${res}");
+    Alarm dumAlarm = new Alarm(
+      id: -1,
+      alarmDateTime: DateTime.now(),
+      isPending: 0,
+      mon: 0,
+      tue: 0,
+      wed: 0,
+      thu: 0,
+      fri: 0,
+      sat: 0,
+      sun: 0
+    );
+    return res.isNotEmpty ? Alarm.fromMap(res.first) : dumAlarm;
   }
 
   // READ ALL DATA

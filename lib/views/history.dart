@@ -45,14 +45,6 @@ class _HistoryTabState extends State<HistoryTab> {
       ]
   );
 
-  @override
-  void initState() {
-    HistoryHelper().database.then((value) {
-      print("----------initialize history database");
-    });
-    super.initState();
-  }
-
   Future<int> loadHistory() async {
     print("load all history");
     print(DateFormat('yy-MM-dd').format(DateTime.now()));

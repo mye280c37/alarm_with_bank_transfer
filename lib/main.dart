@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'models/alarm_model.dart';
-
 import 'alarm_helper.dart';
+import 'history_helper.dart';
 
 import 'views/alarm.dart';
 import 'views/setting.dart';
@@ -35,18 +34,23 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
-  var _alarm;
-  DateTime _time = DateTime.now();
-  AlarmHelper _alarmHelper = AlarmHelper();
-  String _targetTime;
-  bool _alarmOn = false;
-  bool _doesExist = false;
 
   final TextStyle tabBarStyle = TextStyle(
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w400,
       fontSize: 21,
       color: Color.fromARGB(255, 202, 194, 186));
+
+  @override
+  void initState() {
+    AlarmHelper().database.then((value) {
+      print("----------initialize alarm database");
+    });
+    HistoryHelper().database.then((value) {
+      print("----------initialize history database");
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
