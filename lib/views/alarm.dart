@@ -13,8 +13,10 @@ class AlarmTab extends StatefulWidget {
 
 class _AlarmTabState extends State<AlarmTab> {
   DateTime _alarmTime;
+  DateTime defaultAlarmTime = DateTime.now();
   String _targetTime;
   bool _alarmOn;
+  bool defaultAlarmOn;
   Alarm _alarm;
   bool doesExist;
   List<bool> isChecked =[
@@ -26,6 +28,26 @@ class _AlarmTabState extends State<AlarmTab> {
     false,
     false,
   ];
+  List<bool> defaultIsChecked = [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ];
+  bool isLoad = false;
+
+  @override
+  void initState(){
+    loadAlarm().then((value){
+      setState(() {
+        isLoad = true;
+      });
+    });
+    super.initState();
+  }
 
   Future<DateTime> loadAlarm() async {
     print("load alarm");
@@ -55,7 +77,7 @@ class _AlarmTabState extends State<AlarmTab> {
         });
       }
     }
-
+    print("finish load Alarm");
     return _alarmTime;
   }
 
@@ -63,6 +85,10 @@ class _AlarmTabState extends State<AlarmTab> {
   @override
   Widget build(BuildContext context) {
     print("----------------alarm tab build");
+    print("isLoad? ${isLoad}");
+    if(isLoad){
+      print(_alarm.alarmDateTime);
+    }
     Size _size = MediaQuery
         .of(context)
         .size;
@@ -76,131 +102,126 @@ class _AlarmTabState extends State<AlarmTab> {
       color: Color.fromARGB(255, 237, 234, 231),
     );
 
-    return FutureBuilder(
-      future: loadAlarm(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Container(
-            width: _width,
-            height: _height,
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 35, 37, 43),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 15,
+    return Container(
+      width: _width,
+      height: _height,
+      decoration: BoxDecoration(
+        color: Color.fromARGB(255, 35, 37, 43),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            height: 15,
+          ),
+          Container(
+              width: _width * 0.9,
+              height: _height * 0.5,
+              child: Stack(alignment: Alignment.center, children: [
+                Wrap(
+                  children: [
+                    timePickerSpinner(),
+                  ],
                 ),
-                Container(
-                    width: _width * 0.9,
-                    height: _height * 0.5,
-                    child: Stack(alignment: Alignment.center, children: [
-                      Wrap(
-                        children: [
-                          timePickerSpinner(),
-                        ],
-                      ),
-                      Center(
-                        child: Text(
-                          ":",
-                          style: clockStyle,
-                        ),
-                      ),
-                      Positioned(
-                        top: _height * 0.3 + 3,
-                        child: Row(
-                          children: [
-                            Center(
-                              child: Text("HOURS",
-                                  style: clockStyle.copyWith(fontSize: 26)),
-                            ),
-                            Container(
-                              width: _width * 0.1,
-                            ),
-                            Center(
-                              child: Text("MINUTES",
-                                  style: clockStyle.copyWith(fontSize: 25)),
-                            )
-                          ],
-                        ),
-                      )
-                    ])),
-                Container(
-                  width: _width * 0.9,
-                  height: _height * 0.07,
-                  alignment: Alignment.topRight,
-                  child: Switch(
-                    onChanged: (bool value) async {
-                      if(doesExist){
-                        // updateAlarm
-                        Alarm updateAlarm = Alarm(
-                          id: 0,
-                          alarmDateTime: _alarm.alarmDateTime,
-                          isPending: value ? 1 : 0,
-                          mon: isChecked[0] ? 1 : 0,
-                          tue: isChecked[1] ? 1 : 0,
-                          wed: isChecked[2] ? 1 : 0,
-                          thu: isChecked[3] ? 1 : 0,
-                          fri: isChecked[4] ? 1 : 0,
-                          sat: isChecked[5] ? 1 : 0,
-                          sun: isChecked[6] ? 1 : 0,
-                        );
-                        await AlarmHelper().updateAlarm(updateAlarm);
-                      }else{
-                        if(mounted){
-                          setState(() {
-                            doesExist = true;
-                          });
-                        }
-                        // createAlarm
-                        Alarm newAlarm = Alarm(
-                          id: 0,
-                          alarmDateTime: DateTime.now(),
-                          isPending: value ? 1 : 0,
-                          mon: isChecked[0] ? 1 : 0,
-                          tue: isChecked[1] ? 1 : 0,
-                          wed: isChecked[2] ? 1 : 0,
-                          thu: isChecked[3] ? 1 : 0,
-                          fri: isChecked[4] ? 1 : 0,
-                          sat: isChecked[5] ? 1 : 0,
-                          sun: isChecked[6] ? 1 : 0,
-                        );
-                        await AlarmHelper().createAlarm(newAlarm);
-                      }
-                    },
-                    value: _alarmOn,
-                    activeColor: Color.fromARGB(225, 17, 121, 34),
-                    inactiveThumbColor: Color.fromARGB(205, 52, 46, 40),
+                Center(
+                  child: Text(
+                    ":",
+                    style: clockStyle,
                   ),
                 ),
-                SizedBox(
-                  height: 15,
-                ),
-                Container(
-                  width: _width * 0.95,
-                  height: _height * 0.1,
+                Positioned(
+                  top: _height * 0.3 + 3,
                   child: Row(
                     children: [
-                      _day("M", 0),
-                      _day("T", 1),
-                      _day("W", 2),
-                      _day("T", 3),
-                      _day("F", 4),
-                      _day("S", 5),
-                      _day("S", 6),
+                      Center(
+                        child: Text("HOURS",
+                            style: clockStyle.copyWith(fontSize: 26)),
+                      ),
+                      Container(
+                        width: _width * 0.1,
+                      ),
+                      Center(
+                        child: Text("MINUTES",
+                            style: clockStyle.copyWith(fontSize: 25)),
+                      )
                     ],
                   ),
-                ),
+                )
+              ])),
+          Container(
+            width: _width * 0.9,
+            height: _height * 0.07,
+            alignment: Alignment.topRight,
+            child: isLoad? Switch(
+              onChanged: (bool value) async {
+                setState(() {
+                  _alarmOn = value;
+                });
+                print("swtich");
+                if(isLoad){
+                  if(doesExist){
+                    // updateAlarm
+                    Alarm updateAlarm = Alarm(
+                      id: 0,
+                      alarmDateTime: _alarm.alarmDateTime,
+                      isPending: value ? 1 : 0,
+                      mon: isChecked[0] ? 1 : 0,
+                      tue: isChecked[1] ? 1 : 0,
+                      wed: isChecked[2] ? 1 : 0,
+                      thu: isChecked[3] ? 1 : 0,
+                      fri: isChecked[4] ? 1 : 0,
+                      sat: isChecked[5] ? 1 : 0,
+                      sun: isChecked[6] ? 1 : 0,
+                    );
+                    await AlarmHelper().updateAlarm(updateAlarm);
+                  }else{
+                    if(mounted){
+                      setState(() {
+                        doesExist = true;
+                      });
+                    }
+                    // createAlarm
+                    Alarm newAlarm = Alarm(
+                      id: 0,
+                      alarmDateTime: DateTime.now(),
+                      isPending: value ? 1 : 0,
+                      mon: isChecked[0] ? 1 : 0,
+                      tue: isChecked[1] ? 1 : 0,
+                      wed: isChecked[2] ? 1 : 0,
+                      thu: isChecked[3] ? 1 : 0,
+                      fri: isChecked[4] ? 1 : 0,
+                      sat: isChecked[5] ? 1 : 0,
+                      sun: isChecked[6] ? 1 : 0,
+                    );
+                    await AlarmHelper().createAlarm(newAlarm);
+                  }
+                }
+              },
+              value: _alarmOn,
+              activeColor: Color.fromARGB(225, 17, 121, 34),
+              inactiveThumbColor: Color.fromARGB(205, 52, 46, 40),
+            ):Container(),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          Container(
+            width: _width * 0.95,
+            height: _height * 0.1,
+            child: Row(
+              children: [
+                _day("M", 0),
+                _day("T", 1),
+                _day("W", 2),
+                _day("T", 3),
+                _day("F", 4),
+                _day("S", 5),
+                _day("S", 6),
               ],
             ),
-          );
-        } else {
-          return Center(
-              child: CircularProgressIndicator()
-          );
-        }
-      },
+          ),
+        ],
+      ),
     );
   }
 
@@ -214,52 +235,61 @@ class _AlarmTabState extends State<AlarmTab> {
     return Expanded(
       child: GestureDetector(
         onTap: () async {
-          if(mounted){
-            setState(() {
-              print("ontap");
-              if (isChecked[day]) {
-                isChecked[day] = false;
-              } else {
-                isChecked[day] = true;
-              }
-            });
-          }
-          if(doesExist){
-            // updateAlarm
-            Alarm updateAlarm = Alarm(
-              id: 0,
-              alarmDateTime: _alarm.alarmDateTime,
-              isPending: _alarm.isPending,
-              mon: isChecked[0] ? 1 : 0,
-              tue: isChecked[1] ? 1 : 0,
-              wed: isChecked[2] ? 1 : 0,
-              thu: isChecked[3] ? 1 : 0,
-              fri: isChecked[4] ? 1 : 0,
-              sat: isChecked[5] ? 1 : 0,
-              sun: isChecked[6] ? 1 : 0,
-            );
-            await AlarmHelper().updateAlarm(updateAlarm);
-          }else{
+          if(isLoad){
             if(mounted){
               setState(() {
-                doesExist = true;
+                print("ontap");
+                if (isChecked[day]) {
+                  isChecked[day] = false;
+                } else {
+                  isChecked[day] = true;
+                }
               });
             }
-            // createAlarm
-            Alarm newAlarm = Alarm(
-              id: 0,
-              alarmDateTime: DateTime.now(),
-              isPending: 0,
-              mon: isChecked[0] ? 1 : 0,
-              tue: isChecked[1] ? 1 : 0,
-              wed: isChecked[2] ? 1 : 0,
-              thu: isChecked[3] ? 1 : 0,
-              fri: isChecked[4] ? 1 : 0,
-              sat: isChecked[5] ? 1 : 0,
-              sun: isChecked[6] ? 1 : 0,
-            );
-            await AlarmHelper().createAlarm(newAlarm);
+            if(doesExist){
+              // updateAlarm
+              Alarm updateAlarm = Alarm(
+                id: 0,
+                alarmDateTime: _alarm.alarmDateTime,
+                isPending: _alarm.isPending,
+                mon: isChecked[0] ? 1 : 0,
+                tue: isChecked[1] ? 1 : 0,
+                wed: isChecked[2] ? 1 : 0,
+                thu: isChecked[3] ? 1 : 0,
+                fri: isChecked[4] ? 1 : 0,
+                sat: isChecked[5] ? 1 : 0,
+                sun: isChecked[6] ? 1 : 0,
+              );
+              await AlarmHelper().updateAlarm(updateAlarm);
+            }else{
+              if(mounted){
+                setState(() {
+                  doesExist = true;
+                });
+                // createAlarm
+                Alarm newAlarm = Alarm(
+                  id: 0,
+                  alarmDateTime: DateTime.now(),
+                  isPending: 0,
+                  mon: isChecked[0] ? 1 : 0,
+                  tue: isChecked[1] ? 1 : 0,
+                  wed: isChecked[2] ? 1 : 0,
+                  thu: isChecked[3] ? 1 : 0,
+                  fri: isChecked[4] ? 1 : 0,
+                  sat: isChecked[5] ? 1 : 0,
+                  sun: isChecked[6] ? 1 : 0,
+                );
+                await AlarmHelper().createAlarm(newAlarm);
+              }
+            }
+          }else{
+            if(defaultIsChecked[day]){
+              defaultIsChecked[day] = false;
+            }else{
+              defaultIsChecked[day] = true;
+            }
           }
+          print("ontap");
         },
         child: isChecked[day]
             ? Container(
@@ -310,7 +340,7 @@ class _AlarmTabState extends State<AlarmTab> {
     double _width = _size.width;
     double _height = _size.height;
 
-    return new TimePickerSpinner(
+    return isLoad? new TimePickerSpinner(
       time: _alarmTime,
       normalTextStyle: normalTextStyle,
       highlightedTextStyle: highlightTextStyle,
@@ -319,44 +349,52 @@ class _AlarmTabState extends State<AlarmTab> {
       itemWidth: _width * 0.3,
       isForce2Digits: true,
       onTimeChange: (time) async {
-        if(mounted){
-          setState(() {
-            _alarmTime = time;
-          });
-        }
-        if (doesExist) {
-          // update alarm
-          Alarm updateAlarm = Alarm(
-            id: 0,
-            alarmDateTime: time,
-            isPending: _alarmOn ? 1 : 0,
-            mon: isChecked[0] ? 1 : 0,
-            tue: isChecked[1] ? 1 : 0,
-            wed: isChecked[2] ? 1 : 0,
-            thu: isChecked[3] ? 1 : 0,
-            fri: isChecked[4] ? 1 : 0,
-            sat: isChecked[5] ? 1 : 0,
-            sun: isChecked[6] ? 1 : 0,
-          );
-          await AlarmHelper().updateAlarm(updateAlarm);
-        } else {
-          // create alarm
-          Alarm newAlarm = Alarm(
-            id: 0,
-            alarmDateTime: time,
-            isPending: _alarmOn ? 1 : 0,
-            mon: isChecked[0] ? 1 : 0,
-            tue: isChecked[1] ? 1 : 0,
-            wed: isChecked[2] ? 1 : 0,
-            thu: isChecked[3] ? 1 : 0,
-            fri: isChecked[4] ? 1 : 0,
-            sat: isChecked[5] ? 1 : 0,
-            sun: isChecked[6] ? 1 : 0,
-          );
-          await AlarmHelper().createAlarm(newAlarm);
-        }
+        print("onTimeChange");
+          if(mounted){
+            setState(() {
+              _alarmTime = time;
+            });
+          }
+          if (doesExist) {
+            // update alarm
+            Alarm updateAlarm = Alarm(
+              id: 0,
+              alarmDateTime: time,
+              isPending: _alarmOn ? 1 : 0,
+              mon: isChecked[0] ? 1 : 0,
+              tue: isChecked[1] ? 1 : 0,
+              wed: isChecked[2] ? 1 : 0,
+              thu: isChecked[3] ? 1 : 0,
+              fri: isChecked[4] ? 1 : 0,
+              sat: isChecked[5] ? 1 : 0,
+              sun: isChecked[6] ? 1 : 0,
+            );
+            await AlarmHelper().updateAlarm(updateAlarm);
+          } else {
+            // create alarm
+            Alarm newAlarm = Alarm(
+              id: 0,
+              alarmDateTime: time,
+              isPending: _alarmOn ? 1 : 0,
+              mon: isChecked[0] ? 1 : 0,
+              tue: isChecked[1] ? 1 : 0,
+              wed: isChecked[2] ? 1 : 0,
+              thu: isChecked[3] ? 1 : 0,
+              fri: isChecked[4] ? 1 : 0,
+              sat: isChecked[5] ? 1 : 0,
+              sun: isChecked[6] ? 1 : 0,
+            );
+            await AlarmHelper().createAlarm(newAlarm);
+          }
         print("new Date Time: ${_alarmTime}");
       },
+    ):new Container(
+      child: Center(
+        child: Text(
+            "00 00",
+          style: highlightTextStyle,
+        ),
+      ),
     );
   }
 }
