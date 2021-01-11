@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'alarm_helper.dart';
-import 'history_helper.dart';
+import 'package:alarm_with_bank_transfer/alarm_helper.dart';
+import 'package:alarm_with_bank_transfer/history_helper.dart';
 
-import 'views/alarm.dart';
-import 'views/setting.dart';
-import 'views/history.dart';
+import 'package:alarm_with_bank_transfer/views/alarm.dart';
+import 'package:alarm_with_bank_transfer/views/setting.dart';
+import 'package:alarm_with_bank_transfer/views/history.dart';
 
-void main() {
+void main() async {
   runApp(MyApp());
 }
 
