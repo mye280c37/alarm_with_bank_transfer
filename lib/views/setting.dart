@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'turn_off.dart';
 
@@ -8,6 +10,7 @@ class SettingTab extends StatefulWidget {
 }
 
 class _SettingTabState extends State<SettingTab> {
+  SharedPreferences prefs;
 
   final TextStyle menuStyle = TextStyle(
     fontFamily: "AppleSDGothicNeo",
@@ -154,10 +157,40 @@ class DetailView extends StatefulWidget {
 }
 
 class _DetailViewState extends State<DetailView> {
+  final TextEditingController _penaltyController = TextEditingController();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  SharedPreferences prefs;
   String _title;
   int _detailIndex;
+  String _penalty;
+  String _myAccount;
+  final String conncectMessage = 'connect your Account';
+  bool myAccountExist;
+  bool prefsLoad;
 
   _DetailViewState(this._title, this._detailIndex);
+
+  @override
+  void initState(){
+    prefsLoad = false;
+    _penalty = "00,000";
+    _penaltyController.text = _penalty;
+    super.initState();
+  }
+
+  Future<bool> loadData() async {
+    prefs = await SharedPreferences.getInstance();
+    _penalty = (prefs.getString('penalty') ?? '00,000');
+    _penaltyController.text = _penalty;
+    _myAccount = (prefs.getString('myAccount') ?? conncectMessage);
+    if(_myAccount == conncectMessage){
+      myAccountExist = false;
+    }else{
+      myAccountExist = true;
+    }
+
+    return true;
+  }
 
   final TextStyle _titleStyle = TextStyle(
       fontFamily: "AppleSDGothicNeo",
@@ -179,24 +212,53 @@ class _DetailViewState extends State<DetailView> {
     double _width = _size.width;
     double _height = _size.height;
 
-    return Scaffold(
-      resizeToAvoidBottomInset : false,
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 35, 37, 43),
-        title: Text(
-          _title,
-          style: _titleStyle,
-        ),
-      ),
-      body: Container(
-        width: _width,
-        height: _height,
-        padding: EdgeInsets.only(top: _height*0.05, left: _width*0.05, right: _width*0.05),
-        decoration: BoxDecoration(
-          color: Color.fromARGB(255, 35, 37, 43),
-        ),
-        child: _detailView(_detailIndex),
-      ),
+    return GestureDetector(
+      onTap: () async {
+        FocusScope.of(context).unfocus();
+        if(_penaltyController.text.isEmpty){
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+              content: Text(
+                  "Enter price for your penalty.")));
+        } else{
+          setState(() {
+            _penalty = _penaltyController.text;
+            print("penalty is changed: $_penalty");
+          });
+          prefs.setString('penalty', _penalty);
+          print((prefs.getString('penalty') ?? "00,000"));
+        }
+      },
+        child:Scaffold(
+          resizeToAvoidBottomInset : false,
+          key: _scaffoldKey,
+          appBar: AppBar(
+            backgroundColor: Color.fromARGB(255, 35, 37, 43),
+            title: Text(
+              _title,
+              style: _titleStyle,
+            ),
+          ),
+          body: FutureBuilder(
+            future: loadData(),
+            builder: (context, snapshot){
+              if(snapshot.hasData){
+                return Container(
+                    width: _width,
+                    height: _height,
+                    padding: EdgeInsets.only(top: _height*0.05, left: _width*0.05, right: _width*0.05),
+                    decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 35, 37, 43),
+                    ),
+                    child: _detailView(_detailIndex)
+                );
+              }else{
+                return Center(
+                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white),),
+                );
+              }
+            },
+          ),
+        )
     );
   }
 
@@ -281,7 +343,7 @@ class _DetailViewState extends State<DetailView> {
         ]
     );
 
-    return Column(
+    return myAccountExist? Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
@@ -318,10 +380,18 @@ class _DetailViewState extends State<DetailView> {
           ),
         ),
       ],
+    ):Container(
+      child: Center(
+        child: Text(
+          conncectMessage,
+          style: _textStyle.copyWith(fontSize: 20),
+        ),
+      ),
     );
   }
 
   Widget penaltyView(){
+
     TextStyle _textStyle = TextStyle(
         fontFamily: "AppleSDGothicNeo",
         fontWeight: FontWeight.w400,
@@ -337,6 +407,7 @@ class _DetailViewState extends State<DetailView> {
     );
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(
           flex: 3,
@@ -345,11 +416,35 @@ class _DetailViewState extends State<DetailView> {
         Expanded(
           flex: 3,
           child: Container(
-            alignment: Alignment.centerRight,
-            child: Text(
-              "00,000₩",
-              style: _textStyle,
-            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: TextField(
+                    textAlign: TextAlign.right,
+                    controller: _penaltyController,
+                    style: _textStyle,
+                    decoration: InputDecoration(
+                        hintText: "00,000",
+                        hintStyle: _textStyle.copyWith(color: Color.fromARGB(150, 35, 37, 43),),
+                        border: InputBorder.none
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 30,
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Center(
+                      child: Text(
+                      "₩",
+                      style: _textStyle,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
           ),
         ),
         Expanded(

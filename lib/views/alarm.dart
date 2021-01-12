@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 
 import '../models/alarm_model.dart';
 import '../alarm_helper.dart';
+import 'package:alarm_with_bank_transfer/views/alarm_manager.dart';
+import 'package:alarm_with_bank_transfer/views/notification.dart';
 
 class AlarmTab extends StatefulWidget {
 
@@ -154,9 +156,8 @@ class _AlarmTabState extends State<AlarmTab> {
             alignment: Alignment.topRight,
             child: isLoad? Switch(
               onChanged: (bool value) async {
-                setState(() {
-                  _alarmOn = value;
-                });
+                await NotificationTest().showNotificationRepeat();
+
                 print("swtich");
                 if(isLoad){
                   if(doesExist){
@@ -196,6 +197,10 @@ class _AlarmTabState extends State<AlarmTab> {
                     await AlarmHelper().createAlarm(newAlarm);
                   }
                 }
+
+                setState(() {
+                  _alarmOn = value;
+                });
               },
               value: _alarmOn,
               activeColor: Color.fromARGB(225, 17, 121, 34),
@@ -387,6 +392,9 @@ class _AlarmTabState extends State<AlarmTab> {
             await AlarmHelper().createAlarm(newAlarm);
           }
         print("new Date Time: ${_alarmTime}");
+          if(_alarmOn){
+            await loadAlarmManager(DateTime.now(), 0);
+          }
       },
     ):new Container(
       child: Center(

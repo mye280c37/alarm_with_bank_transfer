@@ -11,6 +11,7 @@ class TurnOff extends StatefulWidget {
 }
 
 class _TurnOffState extends State<TurnOff> {
+  bool _turnOff;
   TextStyle clockStyle = TextStyle(
     fontFamily: "AppleSDGothicNeo",
     fontWeight: FontWeight.w800,
@@ -51,6 +52,12 @@ class _TurnOffState extends State<TurnOff> {
           Positioned(
             bottom: _height*0.2,
             child: GestureDetector(
+              onTap: (){
+                setState(() {
+                  _turnOff = true;
+                });
+                Navigator.pop(context);
+              },
               child: Container(
                 width: _width*0.5,
                 height: _height*0.1,
