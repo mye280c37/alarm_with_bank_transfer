@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'turn_off.dart';
 
 class SettingTab extends StatefulWidget {
   @override
@@ -115,26 +114,6 @@ class _SettingTabState extends State<SettingTab> {
               decoration: _menuDecoration,
               child: Text(
                 "Recieving Account",
-                textAlign: TextAlign.right,
-                style: menuStyle,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder:(context)=>TurnOff(targetTime: "10:13",)));
-            },
-            child: Container(
-              width: _width*0.9,
-              height: _height*0.09,
-              margin: EdgeInsets.only(bottom: 20),
-              padding: EdgeInsets.only(right: 20),
-              alignment: Alignment.centerRight,
-              decoration: _menuDecoration,
-              child: Text(
-                "TurnOff",
                 textAlign: TextAlign.right,
                 style: menuStyle,
               ),

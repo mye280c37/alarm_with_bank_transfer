@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:alarm_with_bank_transfer/alarm_helper.dart';
 import 'package:alarm_with_bank_transfer/history_helper.dart';
 
 import 'package:alarm_with_bank_transfer/views/alarm.dart';
@@ -51,9 +50,6 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   void initState() {
-    AlarmHelper().database.then((value) {
-      print("----------initialize alarm database");
-    });
     HistoryHelper().database.then((value) {
       print("----------initialize history database");
     });
