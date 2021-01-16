@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:alarm_with_bank_transfer/open_banking.dart';
 
 class SettingTab extends StatefulWidget {
   @override

@@ -15,10 +15,9 @@ class AlarmManager extends StatefulWidget {
 
 class _AlarmManagerState extends State<AlarmManager> {
   double restTime = 1.0;
+  int timeDifference;
   String _targetTime;
   Timer _timer;
-  int minutes;
-  int seconds;
   bool _progressStart = false;
   double stride;
 
@@ -62,8 +61,10 @@ class _AlarmManagerState extends State<AlarmManager> {
   );
 
   void dispose(){
-    if(_timer != null) _timer.cancel();
-    super.dispose();
+    if(_timer != null) {
+      _timer.cancel();
+      _timer = null;
+    }
   }
 
   @override
@@ -76,7 +77,7 @@ class _AlarmManagerState extends State<AlarmManager> {
 
     _targetTime = DateFormat('HH:mm').format(widget.alarmTime);
 
-    timeCount();
+    countDown();
 
     return Scaffold(
       body: Stack(
@@ -114,8 +115,10 @@ class _AlarmManagerState extends State<AlarmManager> {
               bottom: _height*0.1,
               child: GestureDetector(
                 onTap: (){
-                  _timer.cancel();
-                  _timer = null;
+                  if(_timer != null){
+                    _timer.cancel();
+                    _timer = null;
+                  }
                   Navigator.pop(context);
                 },
                 child: Container(
@@ -134,75 +137,85 @@ class _AlarmManagerState extends State<AlarmManager> {
     );
   }
 
-  void timeCount() {
+  void countDown(){
     DateTime now = DateTime.now();
-    minutes = widget.alarmTime.difference(now).inMinutes;
-    print("minutes: $minutes");
-    if(minutes > 60){
-      print("more than 60 minutes left");
-      _timer = Timer.periodic(Duration(hours: 1), (timer) {
-        if(mounted){
-          setState(() {
-            timer.cancel();
-            minutes = widget.alarmTime.difference(now).inMinutes;
-            print("minutes: $minutes");
-          });
-        }
-      });
-    }else if(minutes > 30){
-      print("more than 30 minutes left");
-      _timer = Timer.periodic(Duration(minutes: 30), (timer) {
-        if(mounted){
-          setState(() {
-            timer.cancel();
-            minutes = widget.alarmTime.difference(now).inMinutes;
-            print("minutes: $minutes");
-          });
-        }
-      });
-    }else if (minutes > 10){
-      print("more than 10 minutes left");
-      _timer = Timer.periodic(Duration(minutes: 5), (timer) {
-        if(mounted){
-          setState(() {
-            _timer.cancel();
-            minutes = widget.alarmTime.difference(now).inMinutes;
-            print("minutes: $minutes");
-          });
-        }
-      });
-    }else{
-      seconds = widget.alarmTime.difference(now).inSeconds;
-      if(seconds < 0){
+    // get time difference in minutes
+    timeDifference = widget.alarmTime.difference(now).inMinutes;
+
+    if(timeDifference <0){
+      if(_timer != null){
         _timer.cancel();
         _timer = null;
+      }
+      Navigator.pop(context);
+    }
+
+    // if difference is less than 2 minutes
+    if(timeDifference <2 && timeDifference >= 0){
+      // get time difference in seconds
+      print("tick tok");
+      timeDifference = widget.alarmTime.difference(now).inSeconds;
+      if(timeDifference == 0){
+        print("time set!");
+        setState(() {
+          restTime = 0;
+        });
       }else{
-        _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-          print("seconds count down start");
-          if(mounted){
-            setState(() {
-              seconds = widget.alarmTime.difference(now).inSeconds;
-              print("seconds: $seconds");
-              if(seconds < 0){
-                print("no difference");
-                _timer.cancel();
-                _timer = null;
-              }
-              if(seconds < 120 && seconds >= 0){
-                if(!_progressStart){
-                  _progressStart = true;
-                  stride = 1/seconds;
-                }else{
-                  restTime -= stride;
-                }
-              }
-            });
-          }
+        startProgressBar();
+      }
+    }else{
+      print("countDown");
+      if(timeDifference < 5){
+        print("more than 1 minutes left($timeDifference)");
+        _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+          print("finish");
+          setState(() {
+            timer.cancel();
+            timer = null;
+          });
+        });
+      }else if(timeDifference < 30){
+        print("more than 5 minutes left($timeDifference)");
+        _timer = Timer.periodic(Duration(minutes: 5), (timer) {
+          print("finish");
+          setState(() {
+            timer.cancel();
+            timer = null;
+          });
+        });
+      }else if(timeDifference <120){
+        print("more than 30 minutes left($timeDifference)");
+        _timer = Timer.periodic(Duration(minutes: 30), (timer) {
+          print("finish");
+          setState(() {
+            timer.cancel();
+            timer = null;
+          });
+        });
+      }else{
+        print("more than 60 minutes left($timeDifference)");
+        _timer = Timer.periodic(Duration(minutes: 60), (timer) {
+          print("finish");
+          setState(() {
+            timer.cancel();
+            timer = null;
+          });
         });
       }
-
     }
-    print("now: $now");
-    print("alarmTime: ${widget.alarmTime}");
+  }
+
+  void startProgressBar(){
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if(!_progressStart){
+          stride = 1/timeDifference;
+          _progressStart = true;
+        }
+        restTime -= stride;
+        timer.cancel();
+        timer = null;
+      });
+    });
   }
 }

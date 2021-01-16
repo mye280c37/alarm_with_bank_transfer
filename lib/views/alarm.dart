@@ -193,12 +193,13 @@ class _AlarmTabState extends State<AlarmTab> {
       highlightedTextStyle: highlightTextStyle,
       alignment: Alignment.center,
       itemHeight: _height * 0.15,
-      itemWidth: _width * 0.35,
+      itemWidth: _width * 0.32,
       isForce2Digits: true,
       onTimeChange: (time) async {
         print("onTimeChange");
         setState(() {
           _targetTime = DateFormat("HH:mm").format(time);
+          prefs.setString('alarmTime', _targetTime);
           setAlarmTime();
         }
         );
