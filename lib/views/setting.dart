@@ -156,7 +156,6 @@ class _DetailViewState extends State<DetailView> {
   @override
   void initState() {
     prefsLoad = false;
-    _penalty = "00,000";
     _penaltyController.text = _penalty;
     super.initState();
   }
@@ -428,7 +427,7 @@ class _DetailViewState extends State<DetailView> {
                   controller: _penaltyController,
                   style: _textStyle,
                   decoration: InputDecoration(
-                      hintText: "00,000",
+                      hintText: "00000",
                       hintStyle: _textStyle.copyWith(
                         color: Color.fromARGB(150, 35, 37, 43),
                       ),

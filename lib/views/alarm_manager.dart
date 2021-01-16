@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:soundpool/soundpool.dart';
+import 'package:vibration/vibration.dart';
+
+import 'package:alarm_with_bank_transfer/models/history_model.dart';
+import 'package:alarm_with_bank_transfer/history_helper.dart';
 
 import 'dart:async';
 
@@ -20,6 +27,11 @@ class _AlarmManagerState extends State<AlarmManager> {
   Timer _timer;
   bool _progressStart = false;
   double stride;
+  Soundpool pool;
+  DateTime _alarmTime;
+  bool restart = false;
+  bool ring = false;
+  int miss = 0;
 
   final BoxDecoration _boxDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(20),
@@ -60,11 +72,24 @@ class _AlarmManagerState extends State<AlarmManager> {
     color: Color.fromARGB(255, 237, 234, 231),
   );
 
+  @override
+  void initState(){
+    if(!restart){
+      _alarmTime = widget.alarmTime;
+    }
+    super.initState();
+  }
+
+  @override
   void dispose(){
     if(_timer != null) {
       _timer.cancel();
       _timer = null;
     }
+    if(pool!=null){
+      pool.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -75,9 +100,13 @@ class _AlarmManagerState extends State<AlarmManager> {
     double _width = _size.width;
     double _height = _size.height;
 
-    _targetTime = DateFormat('HH:mm').format(widget.alarmTime);
+    _targetTime = DateFormat('HH:mm').format(_alarmTime);
 
-    countDown();
+    if(ring){
+      waiting();
+    }else{
+      countDown();
+    }
 
     return Scaffold(
       body: Stack(
@@ -92,9 +121,10 @@ class _AlarmManagerState extends State<AlarmManager> {
               width: _width*0.9,
               height: _width*0.9,
               child: CircularProgressIndicator(
-                backgroundColor: Color.fromARGB(255, 35, 37, 43),
+                backgroundColor: Colors.black87,
                 valueColor: AlwaysStoppedAnimation<Color>(Color.fromARGB(255, 250, 249, 248),),
                 value: restTime,
+                strokeWidth: 2,
               ),
             ),
           ),
@@ -114,11 +144,23 @@ class _AlarmManagerState extends State<AlarmManager> {
           Positioned(
               bottom: _height*0.1,
               child: GestureDetector(
-                onTap: (){
+                onTap: () async {
+                  if(miss > 0){
+                    // create history
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    String _penalty = (prefs.getString('penalty') ?? '00000');
+                    History history = new History(
+                      date: _alarmTime,
+                      timeExceeded: _alarmTime.difference(widget.alarmTime).inMinutes,
+                      penalty: int.parse(_penalty) * miss
+                    );
+                    await HistoryHelper().createHistory(history);
+                  }
                   if(_timer != null){
                     _timer.cancel();
                     _timer = null;
                   }
+                  Vibration.cancel();
                   Navigator.pop(context);
                 },
                 child: Container(
@@ -137,10 +179,11 @@ class _AlarmManagerState extends State<AlarmManager> {
     );
   }
 
-  void countDown(){
+  void  countDown() async {
     DateTime now = DateTime.now();
+
     // get time difference in minutes
-    timeDifference = widget.alarmTime.difference(now).inMinutes;
+    timeDifference = _alarmTime.difference(now).inMinutes;
 
     if(timeDifference <0){
       if(_timer != null){
@@ -154,15 +197,8 @@ class _AlarmManagerState extends State<AlarmManager> {
     if(timeDifference <2 && timeDifference >= 0){
       // get time difference in seconds
       print("tick tok");
-      timeDifference = widget.alarmTime.difference(now).inSeconds;
-      if(timeDifference == 0){
-        print("time set!");
-        setState(() {
-          restTime = 0;
-        });
-      }else{
-        startProgressBar();
-      }
+      timeDifference = _alarmTime.difference(now).inSeconds;
+      startProgressBar();
     }else{
       print("countDown");
       if(timeDifference < 5){
@@ -213,9 +249,44 @@ class _AlarmManagerState extends State<AlarmManager> {
           _progressStart = true;
         }
         restTime -= stride;
-        timer.cancel();
-        timer = null;
+        if(restTime <= 0){
+          ring = true;
+        }
+        _timer.cancel();
       });
     });
+  }
+
+  void waiting() {
+    if(timeDifference <0){
+      if(_timer != null){
+        _timer.cancel();
+        _timer = null;
+      }
+      Navigator.pop(context);
+    }
+
+    print("waiting");
+    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+      print("restart");
+      setState(() {
+        _alarmTime = DateTime.now().add(Duration(minutes: 1));
+        restart = true;
+        ring = false;
+        restTime = 1;
+        miss += 1;
+        _timer.cancel();
+      });
+    });
+//    print("vibration, ring");
+//    await SystemSound.play(SystemSoundType.click);
+//    if (await Vibration.hasVibrator()) {
+//      Vibration.vibrate(pattern: [500, 1000, 500, 2000], repeat: 15, intensities: [1, 255]);
+//    }
+//    pool = new Soundpool(streamType: StreamType.notification);
+//    int soundId = await rootBundle.load("sounds/dices.m4a").then((ByteData soundData) {
+//      return pool.load(soundData);
+//    });
+//    int streamId = await pool.play(soundId);
   }
 }

@@ -172,7 +172,7 @@ class _HistoryTabState extends State<HistoryTab> {
           ),
           Padding(
             padding: EdgeInsets.only(top:5, bottom: 5),
-            child: Text(history.timeExceeded.toString() +" sec", style: tableDetailStyle, textAlign: TextAlign.center,),
+            child: Text(history.timeExceeded.toString() +" min", style: tableDetailStyle, textAlign: TextAlign.center,),
           ),
           Padding(
             padding: EdgeInsets.only(top:5, bottom: 5),
