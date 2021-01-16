@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/alarm_model.dart';
-import '../alarm_helper.dart';
 import 'package:alarm_with_bank_transfer/views/alarm_manager.dart';
-import 'package:alarm_with_bank_transfer/views/notification.dart';
 
 class AlarmTab extends StatefulWidget {
 
@@ -14,83 +12,61 @@ class AlarmTab extends StatefulWidget {
 }
 
 class _AlarmTabState extends State<AlarmTab> {
+  SharedPreferences prefs;
   DateTime _alarmTime;
-  DateTime defaultAlarmTime = DateTime.now();
   String _targetTime;
-  bool _alarmOn;
-  bool defaultAlarmOn;
-  Alarm _alarm;
+  String _date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  String _targetDateTime;
+  String initTime = '00:00';
   bool doesExist;
-  List<bool> isChecked =[
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ];
-  List<bool> defaultIsChecked = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ];
-  bool isLoad = false;
+  bool isLoad;
 
   @override
   void initState(){
-    loadAlarm().then((value){
+    isLoad = false;
+    DateTime _now = DateTime.now();
+    loadData().then((value){
       setState(() {
-        isLoad = true;
+        isLoad = value;
       });
     });
     super.initState();
   }
 
-  Future<DateTime> loadAlarm() async {
-    print("load alarm");
-    _alarm = await AlarmHelper().getAlarm(0);
-    if(mounted){
-      // ignore: unrelated_type_equality_checks
-      if (_alarm.id == -1) {
-        print("alarm is null");
-        setState(() {
-          _alarmTime = DateTime.now();
-          doesExist = false;
-          _alarmOn = true;
-        });
-      } else {
-        print("alarm is not null");
-        setState(() {
-          _alarmTime = _alarm.alarmDateTime;
-          doesExist = true;
-          _alarmOn = _alarm.isPending == 1 ? true : false;
-          isChecked[0] = _alarm.mon == 1? true: false;
-          isChecked[1] = _alarm.tue == 1? true: false;
-          isChecked[2] = _alarm.wed == 1? true: false;
-          isChecked[3] = _alarm.thu == 1? true: false;
-          isChecked[4] = _alarm.fri == 1? true: false;
-          isChecked[5] = _alarm.sat == 1? true: false;
-          isChecked[6] = _alarm.sun == 1? true: false;
-        });
-      }
+  Future<bool> loadData() async {
+    prefs = await SharedPreferences.getInstance();
+    _targetTime = (prefs.getString('alarmTime') ?? initTime);
+    if(_targetTime == initTime){
+      doesExist = false;
+      _alarmTime = DateTime.now();
+    }else{
+      doesExist = true;
+      print("sharedPreference: $_targetTime");
+      setAlarmTime();
     }
-    print("finish load Alarm");
-    return _alarmTime;
+    return true;
   }
-
   // ignore: non_constant_identifier_names
   @override
   Widget build(BuildContext context) {
+    final BoxDecoration _boxDecoration = BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.topRight,
+            colors: [
+              Colors.white,
+              Color.fromARGB(255, 202, 194, 186)
+            ]),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 6.0,
+            color: Colors.black.withOpacity(.2),
+            offset: Offset(5.0, 6.0),
+          ),
+        ]
+    );
     print("----------------alarm tab build");
-    print("isLoad? ${isLoad}");
-    if(isLoad){
-      print(_alarm.alarmDateTime);
-    }
     Size _size = MediaQuery
         .of(context)
         .size;
@@ -104,223 +80,89 @@ class _AlarmTabState extends State<AlarmTab> {
       color: Color.fromARGB(255, 237, 234, 231),
     );
 
+    TextStyle textStyle = TextStyle(
+        fontFamily: "AppleSDGothicNeo",
+        fontWeight: FontWeight.w400,
+        fontSize: 45,
+        color: Color.fromARGB(255, 35, 37, 43),
+        shadows: [
+          Shadow(
+            blurRadius: 5.0,
+            color: Colors.black.withOpacity(.3),
+            offset: Offset(1.0, 1.0),
+          )
+        ]
+    );
+
     return Container(
       width: _width,
       height: _height,
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 35, 37, 43),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-              width: _width * 0.9,
-              height: _height * 0.5,
-              child: Stack(alignment: Alignment.center, children: [
-                Wrap(
-                  children: [
-                    timePickerSpinner(),
-                  ],
-                ),
-                Center(
-                  child: Text(
-                    ":",
-                    style: clockStyle,
-                  ),
-                ),
-                Positioned(
-                  top: _height * 0.3 + 3,
-                  child: Row(
+          Positioned(
+            top: _height*0.15,
+            child: Container(
+                width: _width * 0.9,
+                height: _height * 0.5,
+                child: Stack(alignment: Alignment.center, children: [
+                  Wrap(
                     children: [
-                      Center(
-                        child: Text("HOURS",
-                            style: clockStyle.copyWith(fontSize: 26)),
-                      ),
-                      Container(
-                        width: _width * 0.1,
-                      ),
-                      Center(
-                        child: Text("MINUTES",
-                            style: clockStyle.copyWith(fontSize: 25)),
-                      )
+                      timePickerSpinner(),
                     ],
                   ),
-                )
-              ])),
-          Container(
-            width: _width * 0.9,
-            height: _height * 0.07,
-            alignment: Alignment.topRight,
-            child: isLoad? Switch(
-              onChanged: (bool value) async {
-                await NotificationTest().showNotificationRepeat();
-
-                print("swtich");
-                if(isLoad){
-                  if(doesExist){
-                    // updateAlarm
-                    Alarm updateAlarm = Alarm(
-                      id: 0,
-                      alarmDateTime: _alarm.alarmDateTime,
-                      isPending: value ? 1 : 0,
-                      mon: isChecked[0] ? 1 : 0,
-                      tue: isChecked[1] ? 1 : 0,
-                      wed: isChecked[2] ? 1 : 0,
-                      thu: isChecked[3] ? 1 : 0,
-                      fri: isChecked[4] ? 1 : 0,
-                      sat: isChecked[5] ? 1 : 0,
-                      sun: isChecked[6] ? 1 : 0,
-                    );
-                    await AlarmHelper().updateAlarm(updateAlarm);
-                  }else{
-                    if(mounted){
-                      setState(() {
-                        doesExist = true;
-                      });
-                    }
-                    // createAlarm
-                    Alarm newAlarm = Alarm(
-                      id: 0,
-                      alarmDateTime: DateTime.now(),
-                      isPending: value ? 1 : 0,
-                      mon: isChecked[0] ? 1 : 0,
-                      tue: isChecked[1] ? 1 : 0,
-                      wed: isChecked[2] ? 1 : 0,
-                      thu: isChecked[3] ? 1 : 0,
-                      fri: isChecked[4] ? 1 : 0,
-                      sat: isChecked[5] ? 1 : 0,
-                      sun: isChecked[6] ? 1 : 0,
-                    );
-                    await AlarmHelper().createAlarm(newAlarm);
-                  }
-                }
-
-                setState(() {
-                  _alarmOn = value;
-                });
+                  Center(
+                    child: Text(
+                      ":",
+                      style: clockStyle,
+                    ),
+                  ),
+                  Positioned(
+                    top: _height * 0.3 + 3,
+                    child: Row(
+                      children: [
+                        Center(
+                          child: Text("HOURS",
+                              style: clockStyle.copyWith(fontSize: 26)),
+                        ),
+                        Container(
+                          width: _width * 0.1,
+                        ),
+                        Center(
+                          child: Text("MINUTES",
+                              style: clockStyle.copyWith(fontSize: 25)),
+                        )
+                      ],
+                    ),
+                  )
+                ])),
+          ),
+          Positioned(
+            bottom: _height*0.1,
+            child: GestureDetector(
+              onTap: (){
+                setAlarmTime();
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => AlarmManager(alarmTime: _alarmTime)
+                ));
               },
-              value: _alarmOn,
-              activeColor: Color.fromARGB(225, 17, 121, 34),
-              inactiveThumbColor: Color.fromARGB(205, 52, 46, 40),
-            ):Container(),
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          Container(
-            width: _width * 0.95,
-            height: _height * 0.1,
-            child: Row(
-              children: [
-                _day("M", 0),
-                _day("T", 1),
-                _day("W", 2),
-                _day("T", 3),
-                _day("F", 4),
-                _day("S", 5),
-                _day("S", 6),
-              ],
+              child: Container(
+                alignment: Alignment.center,
+                width: _width*0.6,
+                height: _height*0.1,
+                decoration: _boxDecoration,
+                child: Text(
+                  "SET",
+                  textAlign: TextAlign.center,
+                  style: textStyle,
+                ),
+              ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _day(String name, int day) {
-    Color _checkedColor = Color.fromARGB(255, 237, 234, 231);
-    TextStyle _textstyle = TextStyle(
-        fontFamily: "AppleSDGothicNeo",
-        fontWeight: FontWeight.w400,
-        fontSize: 24,
-        color: Color.fromARGB(255, 202, 194, 186));
-    return Expanded(
-      child: GestureDetector(
-        onTap: () async {
-          if(isLoad){
-            if(mounted){
-              setState(() {
-                print("ontap");
-                if (isChecked[day]) {
-                  isChecked[day] = false;
-                } else {
-                  isChecked[day] = true;
-                }
-              });
-            }
-            if(doesExist){
-              // updateAlarm
-              Alarm updateAlarm = Alarm(
-                id: 0,
-                alarmDateTime: _alarm.alarmDateTime,
-                isPending: _alarm.isPending,
-                mon: isChecked[0] ? 1 : 0,
-                tue: isChecked[1] ? 1 : 0,
-                wed: isChecked[2] ? 1 : 0,
-                thu: isChecked[3] ? 1 : 0,
-                fri: isChecked[4] ? 1 : 0,
-                sat: isChecked[5] ? 1 : 0,
-                sun: isChecked[6] ? 1 : 0,
-              );
-              await AlarmHelper().updateAlarm(updateAlarm);
-            }else{
-              if(mounted){
-                setState(() {
-                  doesExist = true;
-                });
-                // createAlarm
-                Alarm newAlarm = Alarm(
-                  id: 0,
-                  alarmDateTime: DateTime.now(),
-                  isPending: 0,
-                  mon: isChecked[0] ? 1 : 0,
-                  tue: isChecked[1] ? 1 : 0,
-                  wed: isChecked[2] ? 1 : 0,
-                  thu: isChecked[3] ? 1 : 0,
-                  fri: isChecked[4] ? 1 : 0,
-                  sat: isChecked[5] ? 1 : 0,
-                  sun: isChecked[6] ? 1 : 0,
-                );
-                await AlarmHelper().createAlarm(newAlarm);
-              }
-            }
-          }else{
-            if(defaultIsChecked[day]){
-              defaultIsChecked[day] = false;
-            }else{
-              defaultIsChecked[day] = true;
-            }
-          }
-          print("ontap");
-        },
-        child: isChecked[day]
-            ? Container(
-          alignment: Alignment.center,
-          margin: EdgeInsets.only(left: 5, right: 5),
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color.fromARGB(255, 156, 143, 128)),
-          child: Text(
-            name,
-            style: _textstyle.copyWith(color: _checkedColor),
-          ),
-        )
-            : Container(
-          alignment: Alignment.center,
-          margin: EdgeInsets.only(left: 2.5, right: 2.5),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Color.fromARGB(255, 156, 143, 128)),
-            color: Color.fromARGB(255, 35, 37, 43),
-          ),
-          child: Text(
-            name,
-            style: _textstyle,
-          ),
-        ),
       ),
     );
   }
@@ -329,13 +171,13 @@ class _AlarmTabState extends State<AlarmTab> {
     TextStyle highlightTextStyle = new TextStyle(
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w800,
-      fontSize: 78,
+      fontSize: 85,
       color: Color.fromARGB(255, 250, 249, 248),
     );
     TextStyle normalTextStyle = new TextStyle(
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w800,
-      fontSize: 75,
+      fontSize: 80,
       color: Color.fromARGB(255, 75, 79, 93),
     );
 
@@ -351,58 +193,36 @@ class _AlarmTabState extends State<AlarmTab> {
       highlightedTextStyle: highlightTextStyle,
       alignment: Alignment.center,
       itemHeight: _height * 0.15,
-      itemWidth: _width * 0.3,
+      itemWidth: _width * 0.35,
       isForce2Digits: true,
       onTimeChange: (time) async {
         print("onTimeChange");
-          if(mounted){
-            setState(() {
-              _alarmTime = time;
-            });
-          }
-          if (doesExist) {
-            // update alarm
-            Alarm updateAlarm = Alarm(
-              id: 0,
-              alarmDateTime: time,
-              isPending: _alarmOn ? 1 : 0,
-              mon: isChecked[0] ? 1 : 0,
-              tue: isChecked[1] ? 1 : 0,
-              wed: isChecked[2] ? 1 : 0,
-              thu: isChecked[3] ? 1 : 0,
-              fri: isChecked[4] ? 1 : 0,
-              sat: isChecked[5] ? 1 : 0,
-              sun: isChecked[6] ? 1 : 0,
-            );
-            await AlarmHelper().updateAlarm(updateAlarm);
-          } else {
-            // create alarm
-            Alarm newAlarm = Alarm(
-              id: 0,
-              alarmDateTime: time,
-              isPending: _alarmOn ? 1 : 0,
-              mon: isChecked[0] ? 1 : 0,
-              tue: isChecked[1] ? 1 : 0,
-              wed: isChecked[2] ? 1 : 0,
-              thu: isChecked[3] ? 1 : 0,
-              fri: isChecked[4] ? 1 : 0,
-              sat: isChecked[5] ? 1 : 0,
-              sun: isChecked[6] ? 1 : 0,
-            );
-            await AlarmHelper().createAlarm(newAlarm);
-          }
-        print("new Date Time: ${_alarmTime}");
-          if(_alarmOn){
-            await loadAlarmManager(DateTime.now(), 0);
-          }
+        setState(() {
+          _targetTime = DateFormat("HH:mm").format(time);
+          setAlarmTime();
+        }
+        );
       },
-    ):new Container(
+    ):Container(
       child: Center(
         child: Text(
-            "00 00",
+          "00:00",
           style: highlightTextStyle,
         ),
       ),
     );
+  }
+
+  void setAlarmTime(){
+    _targetDateTime = _date+" "+_targetTime;
+    _alarmTime = DateFormat('yyyy-MM-dd HH:mm').parse(_targetDateTime);
+    print("new alarmTime: $_alarmTime");
+    if(_alarmTime.difference(DateTime.now()).inSeconds <= 0){
+      DateTime aDayAfter = DateTime.now().add(Duration(days: 1));
+      String _aDayAfterDate = DateFormat('yyyy-MM-dd').format(aDayAfter);
+      _targetDateTime = _aDayAfterDate+" "+_targetTime;
+      _alarmTime = DateFormat('yyyy-MM-dd HH:mm').parse(_targetDateTime);
+      print('changed alarmTime: $_alarmTime');
+    }
   }
 }

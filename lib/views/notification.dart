@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:alarm_with_bank_transfer/views/turn_off.dart';
 import 'package:alarm_with_bank_transfer/views/timezone.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -21,7 +20,6 @@ class NotificationTest{
 
   Future onSelectNotification(String payload) async {
     print("onSelectNotification");
-    TurnOff(targetTime: "10:23");
   }
 
 //  Future _showNotificationAtTime() async {
@@ -82,7 +80,6 @@ class NotificationTest{
         'your channel id', 'your channel name', 'your channel description',
         importance: Importance.max, priority: Priority.high);
 
-    TurnOff(targetTime: "10:23");
     var iosPlatformChannelSpecifics =
     IOSNotificationDetails(sound: 'slow_spring.board.aiff');
     var platformChannelSpecifics = NotificationDetails(
