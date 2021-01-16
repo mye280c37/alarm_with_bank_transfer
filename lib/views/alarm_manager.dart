@@ -257,7 +257,7 @@ class _AlarmManagerState extends State<AlarmManager> {
     });
   }
 
-  void waiting() {
+  Future<void> waiting() async {
     if(timeDifference <0){
       if(_timer != null){
         _timer.cancel();
@@ -275,14 +275,16 @@ class _AlarmManagerState extends State<AlarmManager> {
         ring = false;
         restTime = 1;
         miss += 1;
+        Vibration.cancel();
         _timer.cancel();
       });
     });
-//    print("vibration, ring");
+    if (await Vibration.hasVibrator()) {
+      print("vibration, ring");
+      Vibration.vibrate(pattern: [1000, 1000, 2000, 2000, 2000, 3000, 2000, 4000, 1000, 5000, 2000, 6000, 1000, 1000, 2000, 2000, 2000, 3000, 2000, 4000, 1000, 5000, 2000, 6000], intensities: [1, 255]);
+    }
 //    await SystemSound.play(SystemSoundType.click);
-//    if (await Vibration.hasVibrator()) {
-//      Vibration.vibrate(pattern: [500, 1000, 500, 2000], repeat: 15, intensities: [1, 255]);
-//    }
+
 //    pool = new Soundpool(streamType: StreamType.notification);
 //    int soundId = await rootBundle.load("sounds/dices.m4a").then((ByteData soundData) {
 //      return pool.load(soundData);
