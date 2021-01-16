@@ -23,15 +23,24 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  #local DB
   sqflite: ^1.3.0
   path_provider: ^1.6.24
   path: ^1.7.0
+  #alarm time picker
   flutter_time_picker_spinner: ^1.0.6+1
+  #change DateTime to String
   intl: ^0.16.1
+  #for save data persistantly
   shared_preferences: ^0.4.3
+  #ring alarm
   flutter_local_notifications: ^3.0.3
   android_alarm_manager: ^0.4.5+20
   timezone: ^0.5.9
+  #openbanking API
+  http: ^0.12.2
+  dio: ^3.0.10
+  oauth2_client: ^1.6.1
 
 
   # The following adds the Cupertino Icons font to your application.
