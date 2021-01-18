@@ -163,7 +163,9 @@ class _DetailViewState extends State<DetailView> {
   Future<bool> loadData() async {
     prefs = await SharedPreferences.getInstance();
     _penalty = (prefs.getString('penalty') ?? '00,000');
-    _penaltyController.text = _penalty;
+    if(_penalty != '00,000'){
+      _penaltyController.text = _penalty;
+    }
     _myAccount = (prefs.getString('myAccount') ?? conncectMessage);
     if (_myAccount == conncectMessage) {
       myAccountExist = false;
@@ -206,6 +208,9 @@ class _DetailViewState extends State<DetailView> {
             });
             prefs.setString('penalty', _penalty);
             print((prefs.getString('penalty') ?? "00,000"));
+            if(_penalty != '00,000'){
+              _penaltyController.text = _penalty;
+            }
           }
         },
         child: Scaffold(
