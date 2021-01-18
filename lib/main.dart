@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:android_alarm_manager/android_alarm_manager.dart';
 
 import 'package:alarm_with_bank_transfer/history_helper.dart';
 
@@ -9,7 +8,6 @@ import 'package:alarm_with_bank_transfer/views/history.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AndroidAlarmManager.initialize();
   runApp(MyApp());
 }
 

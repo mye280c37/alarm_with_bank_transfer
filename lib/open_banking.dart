@@ -7,11 +7,6 @@ import 'package:oauth2_client/oauth2_client.dart';
 import 'api.dart';
 import 'dart:math';
 
-OAuth2Client myOAuth2Client = OAuth2Client(
-    redirectUri: redirectUri,
-    authorizeUrl: redirectUri + '/authorize',
-    tokenUrl: redirectUri + '/token');
-
 Future<String> getOAuth() async {
   print("start authorization");
   Map<String, String> formData = {

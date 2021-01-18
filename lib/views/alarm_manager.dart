@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soundpool/soundpool.dart';
 import 'package:vibration/vibration.dart';
+import 'package:screen/screen.dart';
 
 import 'package:alarm_with_bank_transfer/models/history_model.dart';
 import 'package:alarm_with_bank_transfer/history_helper.dart';
@@ -27,7 +27,6 @@ class _AlarmManagerState extends State<AlarmManager> {
   Timer _timer;
   bool _progressStart = false;
   double stride;
-  Soundpool pool;
   DateTime _alarmTime;
   bool restart = false;
   bool ring = false;
@@ -86,9 +85,6 @@ class _AlarmManagerState extends State<AlarmManager> {
       _timer.cancel();
       _timer = null;
     }
-    if(pool!=null){
-      pool.dispose();
-    }
     super.dispose();
   }
 
@@ -107,6 +103,8 @@ class _AlarmManagerState extends State<AlarmManager> {
     }else{
       countDown();
     }
+
+    Screen.keepOn(true);
 
     return Scaffold(
       body: Stack(

@@ -34,11 +34,8 @@ dependencies:
   # save penalty and account
   shared_preferences: ^0.4.3
   # alarm ring
-  flutter_local_notifications: ^3.0.3
-  android_alarm_manager: ^0.4.5+20
-  timezone: ^0.5.9
-  soundpool: ^1.1.3
   vibration: ^1.7.3
+  screen: ^0.0.5
   # open banking API
   http: ^0.12.2
   dio: ^3.0.10
