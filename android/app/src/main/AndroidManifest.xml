@@ -68,8 +68,8 @@
 
                 <data
                     android:scheme="https"
-                    android:host="www.alarm-transfer.com"
-                    android:pathPrefix="/redirect-uri" />
+                    android:host="www.alarm-banktransfer.com"
+                    android:pathPrefix="/redirecturi" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

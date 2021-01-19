@@ -16,7 +16,7 @@ class _HistoryTabState extends State<HistoryTab> {
       fontFamily: "AppleSDGothicNeo",
       fontWeight: FontWeight.w500,
       color: Colors.black,
-      fontSize: 18,
+      fontSize: 17,
       height: 1.8
   );
 
@@ -81,41 +81,45 @@ class _HistoryTabState extends State<HistoryTab> {
                       SizedBox(
                         height: _height*0.01,
                       ),
-                      Table(
-                        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                        columnWidths: {
-                          0: FractionColumnWidth(.27),
-                          1: FractionColumnWidth(.39),
-                          2: FractionColumnWidth(.34),
-                        },
+                      Wrap(
                         children: [
-                          // title of each columns
-                          TableRow(
-                            // Title of each Column
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(0, 0, 0, 0),
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Color.fromARGB(255, 35, 37, 43),
-                                    style: BorderStyle.solid,
+                          Table(
+                            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                            columnWidths: {
+                              0: FractionColumnWidth(.26),
+                              1: FractionColumnWidth(.4),
+                              2: FractionColumnWidth(.34),
+                            },
+                            children: [
+                              // title of each columns
+                              TableRow(
+                                // Title of each Column
+                                  decoration: BoxDecoration(
+                                    color: Color.fromARGB(0, 0, 0, 0),
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Color.fromARGB(255, 35, 37, 43),
+                                        style: BorderStyle.solid,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(bottom: 1.5),
+                                      child: Text("Date", style: tableTitleStyle, textAlign: TextAlign.center,),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(bottom: 1.5),
+                                      child: Text("TimeExceeded", style: tableTitleStyle, textAlign: TextAlign.center,),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(bottom: 1.5),
+                                      child: Text("Penalty", style: tableTitleStyle, textAlign: TextAlign.center,),
+                                    ),
+                                  ]
                               ),
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(bottom: 1.5),
-                                  child: Text("Date", style: tableTitleStyle, textAlign: TextAlign.center,),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(bottom: 1.5),
-                                  child: Text("TimeExceeded", style: tableTitleStyle, textAlign: TextAlign.center,),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(bottom: 1.5),
-                                  child: Text("Penalty", style: tableTitleStyle, textAlign: TextAlign.center,),
-                                ),
-                              ]
-                          ),
+                            ],
+                          )
                         ],
                       ),
                       Flexible(
