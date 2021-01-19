@@ -39,7 +39,6 @@ dependencies:
   # open banking API
   http: ^0.12.2
   dio: ^3.0.10
-  oauth2_client: ^1.6.1
 
 
   # The following adds the Cupertino Icons font to your application.
