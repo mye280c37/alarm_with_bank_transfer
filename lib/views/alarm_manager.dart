@@ -146,11 +146,14 @@ class _AlarmManagerState extends State<AlarmManager> {
                   if(miss > 0){
                     // create history
                     SharedPreferences prefs = await SharedPreferences.getInstance();
-                    String _penalty = (prefs.getString('penalty') ?? '00000');
+                    int _penalty = (prefs.getInt('penalty') ?? 0);
+                    int _left = (prefs.getInt('left') ?? 0);
+                    _left += _penalty;
+                    prefs.setInt('left', _left);
                     History history = new History(
                       date: _alarmTime,
                       timeExceeded: _alarmTime.difference(widget.alarmTime).inMinutes,
-                      penalty: int.parse(_penalty) * miss
+                      penalty: _penalty * miss
                     );
                     await HistoryHelper().createHistory(history);
                   }
@@ -279,7 +282,7 @@ class _AlarmManagerState extends State<AlarmManager> {
     });
     if (await Vibration.hasVibrator()) {
       print("vibration, ring");
-      Vibration.vibrate(pattern: [1000, 1000, 2000, 2000, 2000, 3000, 2000, 4000, 1000, 5000, 2000, 6000, 1000, 1000, 2000, 2000, 2000, 3000, 2000, 4000, 1000, 5000, 2000, 6000], intensities: [1, 255]);
+      Vibration.vibrate(pattern: [2000, 2000, 4000, 4000, 4000, 6000, 4000, 8000, 2000, 8000, 2000, 4000, 5000, 3000, 2000, 2000]);
     }
 //    await SystemSound.play(SystemSoundType.click);
 

@@ -39,7 +39,8 @@ dependencies:
   # open banking API
   http: ^0.12.2
   dio: ^3.0.10
-
+  # toss
+  url_launcher: ^5.7.10
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:alarm_with_bank_transfer/open_banking.dart';
 
 class SettingTab extends StatefulWidget {
   @override
@@ -60,32 +59,8 @@ class _SettingTabState extends State<SettingTab> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => DetailView(
-                            title: "My Account",
-                            detailIndex: 0,
-                          )));
-            },
-            child: Container(
-              width: _width * 0.9,
-              height: _height * 0.09,
-              margin: EdgeInsets.only(bottom: 20),
-              padding: EdgeInsets.only(right: 20),
-              alignment: Alignment.centerRight,
-              decoration: _menuDecoration,
-              child: Text(
-                "My Account",
-                textAlign: TextAlign.right,
-                style: menuStyle,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
                       builder: (context) =>
-                          DetailView(title: "Penalty", detailIndex: 1)));
+                          DetailView(title: "Penalty", detailIndex: 0)));
             },
             child: Container(
               width: _width * 0.9,
@@ -107,7 +82,7 @@ class _SettingTabState extends State<SettingTab> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => DetailView(
-                          title: "Receiving Account", detailIndex: 2)));
+                          title: "Receiving Account", detailIndex: 1)));
             },
             child: Container(
               width: _width * 0.9,
@@ -141,12 +116,15 @@ class DetailView extends StatefulWidget {
 
 class _DetailViewState extends State<DetailView> {
   final TextEditingController _penaltyController = TextEditingController();
+  final TextEditingController _bankNameController = TextEditingController();
+  final TextEditingController _accountNoController = TextEditingController();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   SharedPreferences prefs;
   String _title;
   int _detailIndex;
-  String _penalty;
-  String _myAccount;
+  int _penalty;
+  String _receivedAccountNo;
+  String _receivedBankName;
   final String conncectMessage = 'connect your Account';
   bool myAccountExist;
   bool prefsLoad;
@@ -156,23 +134,24 @@ class _DetailViewState extends State<DetailView> {
   @override
   void initState() {
     prefsLoad = false;
-    _penaltyController.text = _penalty;
     super.initState();
   }
 
   Future<bool> loadData() async {
     prefs = await SharedPreferences.getInstance();
-    _penalty = (prefs.getString('penalty') ?? '00,000');
-    if(_penalty != '00,000'){
-      _penaltyController.text = _penalty;
-    }
-    _myAccount = (prefs.getString('myAccount') ?? conncectMessage);
-    if (_myAccount == conncectMessage) {
-      myAccountExist = false;
-    } else {
-      myAccountExist = true;
-    }
+    _penalty = (prefs.getInt('penalty') ?? 0);
+    _receivedAccountNo = (prefs.getString('receivedAccountNo') ?? '00000000000000000');
+    _receivedBankName = (prefs.getString('receivedBankName') ?? '은행명을 입력해주세요');
 
+    if(_penalty != 0){
+      _penaltyController.text = _penalty.toString();
+    }
+    if(_receivedAccountNo != '00000000000000000'){
+      _accountNoController.text = _receivedAccountNo;
+    }
+    if(_receivedBankName != '은행명을 입력해주세요'){
+      _bankNameController.text = _receivedBankName;
+    }
     return true;
   }
 
@@ -198,18 +177,52 @@ class _DetailViewState extends State<DetailView> {
     return GestureDetector(
         onTap: () async {
           FocusScope.of(context).unfocus();
-          if (_penaltyController.text.isEmpty) {
-            _scaffoldKey.currentState.showSnackBar(
-                SnackBar(content: Text("Enter price for your penalty.")));
-          } else {
-            setState(() {
-              _penalty = _penaltyController.text;
-              print("penalty is changed: $_penalty");
-            });
-            prefs.setString('penalty', _penalty);
-            print((prefs.getString('penalty') ?? "00,000"));
-            if(_penalty != '00,000'){
-              _penaltyController.text = _penalty;
+          if(_detailIndex == 0){
+            if (_penaltyController.text.isEmpty) {
+              _scaffoldKey.currentState.showSnackBar(
+                  SnackBar(content: Text("Enter price for your penalty.")));
+            } else {
+              setState(() {
+                _penalty = int.parse(_penaltyController.text);
+                print("penalty is changed: $_penalty");
+              });
+              prefs.setInt('penalty', _penalty);
+              print((prefs.getInt('penalty') ?? 0));
+              if(_penalty != 0){
+                _penaltyController.text = _penalty.toString();
+              }
+            }
+          }
+          else if(_detailIndex == 1){
+            // accountNo controller
+            if (_accountNoController.text.isEmpty) {
+              _scaffoldKey.currentState.showSnackBar(
+                  SnackBar(content: Text("Enter received Account numbers.")));
+            } else {
+              setState(() {
+                _receivedAccountNo = _accountNoController.text;
+                print("AccountNo is changed: $_receivedAccountNo");
+              });
+              prefs.setString('receivedAccountNo', _receivedAccountNo);
+              print((prefs.getString('receivedAccountNo') ?? "no account number"));
+              if(_receivedAccountNo != "no account number"){
+                _accountNoController.text = _receivedAccountNo;
+              }
+            }
+            // bankName controller
+            if (_bankNameController.text.isEmpty) {
+              _scaffoldKey.currentState.showSnackBar(
+                  SnackBar(content: Text("Enter received bank name.")));
+            } else {
+              setState(() {
+                _receivedBankName = _bankNameController.text;
+                print("Bank Name is changed: $_receivedBankName");
+              });
+              prefs.setString('receivedBankName', _receivedBankName);
+              print((prefs.getString('receivedBankName') ?? "은행명을 입력해주세요(한글)"));
+              if(_receivedBankName != "은행명을 입력해주세요(한글)"){
+                _bankNameController.text = _receivedBankName;
+              }
             }
           }
         },
@@ -275,19 +288,6 @@ class _DetailViewState extends State<DetailView> {
           Container(
             alignment: Alignment.topCenter,
             width: _width * 0.9,
-            height: _height * 0.28,
-            decoration: _boxDecoration,
-            padding: EdgeInsets.all(15),
-            child: myAccountView(),
-          )
-        ],
-      );
-    } else if (detailIndex == 1) {
-      return Stack(
-        children: [
-          Container(
-            alignment: Alignment.topCenter,
-            width: _width * 0.9,
             height: _height * 0.2,
             decoration: _boxDecoration,
             padding: EdgeInsets.all(15),
@@ -312,14 +312,10 @@ class _DetailViewState extends State<DetailView> {
   }
 
   Widget myAccountView() {
-    Size _size = MediaQuery.of(context).size;
-    double _width = _size.width;
-    double _height = _size.height;
-
     TextStyle _textStyle = TextStyle(
         fontFamily: "AppleSDGothicNeo",
         fontWeight: FontWeight.w400,
-        fontSize: 16,
+        fontSize: 24,
         color: Color.fromARGB(255, 35, 37, 43),
         shadows: [
           Shadow(
@@ -329,74 +325,34 @@ class _DetailViewState extends State<DetailView> {
           )
         ]);
 
-    return myAccountExist
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Container(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "01234522312345667",
-                    style: _textStyle,
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "우리은행",
-                    style: _textStyle,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    "000,000₩",
-                    style: _textStyle.copyWith(fontSize: 30),
-                  ),
-                ),
-              ),
-            ],
-          )
-        : Container(
-            child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                  child: Text(
-                conncectMessage,
-                style: _textStyle.copyWith(fontSize: 20),
-              )),
-              SizedBox(
-                height: _height * 0.02,
-              ),
-              Container(
-                width: _width * 0.5,
-                height: _height * 0.08,
-                child: RaisedButton(
-                  onPressed: () async {
-                    String result = await getOAuth();
-                    print("result: $result");
-                  },
-                  color: Color.fromARGB(155, 156, 143, 128),
-                  child: Center(
-                    child: Text("CONNECT",
-                        style: _textStyle.copyWith(fontSize: 30)),
-                  ),
-                ),
-              ),
-            ],
-          ));
+    return Column(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Container(),
+        ),
+        Expanded(
+          flex: 1,
+          child: Container(
+            alignment: Alignment.centerRight,
+            child: Text(
+              "우리은행",
+              style: _textStyle,
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: Container(
+            alignment: Alignment.centerRight,
+            child: Text(
+              "01234522312345667",
+              style: _textStyle.copyWith(fontSize: 18),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget penaltyView() {
@@ -431,7 +387,7 @@ class _DetailViewState extends State<DetailView> {
                   textAlign: TextAlign.right,
                   controller: _penaltyController,
                   style: _textStyle,
-                  decoration: InputDecoration(
+                  decoration: InputDecoration.collapsed(
                       hintText: "00000",
                       hintStyle: _textStyle.copyWith(
                         color: Color.fromARGB(150, 35, 37, 43),
@@ -440,15 +396,11 @@ class _DetailViewState extends State<DetailView> {
                 ),
               ),
               Container(
-                width: 30,
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: 5),
-                  child: Center(
-                    child: Text(
-                      "₩",
-                      style: _textStyle,
-                    ),
-                  ),
+                width: 23,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "₩",
+                  style: _textStyle,
                 ),
               ),
             ],
@@ -475,7 +427,7 @@ class _DetailViewState extends State<DetailView> {
     TextStyle _textStyle = TextStyle(
         fontFamily: "AppleSDGothicNeo",
         fontWeight: FontWeight.w400,
-        fontSize: 22,
+        fontSize: 24,
         color: Color.fromARGB(255, 35, 37, 43),
         shadows: [
           Shadow(
@@ -495,9 +447,17 @@ class _DetailViewState extends State<DetailView> {
           flex: 1,
           child: Container(
             alignment: Alignment.centerRight,
-            child: Text(
-              "우리은행",
+            child: TextField(
+              controller: _bankNameController,
+              textAlign: TextAlign.right,
               style: _textStyle,
+              decoration: InputDecoration.collapsed(
+                hintText: '우리은행',
+                hintStyle: _textStyle.copyWith(
+                  color: Color.fromARGB(150, 35, 37, 43),
+                ),
+                  border: InputBorder.none
+              ),
             ),
           ),
         ),
@@ -505,9 +465,17 @@ class _DetailViewState extends State<DetailView> {
           flex: 1,
           child: Container(
             alignment: Alignment.centerRight,
-            child: Text(
-              "01234522312345667",
-              style: _textStyle.copyWith(fontSize: 16),
+            child: TextField(
+              controller: _accountNoController,
+              textAlign: TextAlign.right,
+              style: _textStyle.copyWith(fontSize: 20),
+              decoration: InputDecoration.collapsed(
+                  hintText: '00000000000000000',
+                  hintStyle: _textStyle.copyWith(
+                    color: Color.fromARGB(150, 35, 37, 43), fontSize: 20
+                  ),
+                  border: InputBorder.none
+              ),
             ),
           ),
         ),
