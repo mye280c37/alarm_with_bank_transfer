@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:alarm_with_bank_transfer/views/alarm_manager.dart';
+import 'package:alarm_with_bank_transfer/views/dialog.dart';
+import 'package:alarm_with_bank_transfer/views/setting.dart';
 
 class AlarmTab extends StatefulWidget {
 
@@ -145,9 +147,17 @@ class _AlarmTabState extends State<AlarmTab> {
             child: GestureDetector(
               onTap: (){
                 setAlarmTime();
-                Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => AlarmManager(alarmTime: _alarmTime)
-                ));
+                int penalty = prefs.getInt('penalty') ?? 0;
+                if(penalty == 0){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailView(title: "Penalty", detailIndex: 0)));
+                  showDialog(context: context, builder: (BuildContext context)=>
+                      ErrorDialog(errorMsg: "fill penalty",)
+                  );
+                }else{
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => AlarmManager(alarmTime: _alarmTime)
+                  ));
+                }
               },
               child: Container(
                 alignment: Alignment.center,
@@ -207,7 +217,7 @@ class _AlarmTabState extends State<AlarmTab> {
     ):Container(
       child: Center(
         child: Text(
-          "00:00",
+          "00 00",
           style: highlightTextStyle,
         ),
       ),

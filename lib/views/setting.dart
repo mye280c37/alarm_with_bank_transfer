@@ -145,12 +145,21 @@ class _DetailViewState extends State<DetailView> {
 
     if(_penalty != 0){
       _penaltyController.text = _penalty.toString();
+      // change controller's cursor point
+      _penaltyController.selection = new TextSelection.fromPosition(
+          new TextPosition(offset: _penaltyController.text.length));
     }
     if(_receivedAccountNo != '00000000000000000'){
       _accountNoController.text = _receivedAccountNo;
+      // change controller's cursor point
+      _accountNoController.selection = new TextSelection.fromPosition(
+          new TextPosition(offset: _accountNoController.text.length));
     }
     if(_receivedBankName != '은행명을 입력해주세요'){
       _bankNameController.text = _receivedBankName;
+      // change controller's cursor point
+      _bankNameController.selection = new TextSelection.fromPosition(
+          new TextPosition(offset: _bankNameController.text.length));
     }
     return true;
   }
@@ -190,6 +199,9 @@ class _DetailViewState extends State<DetailView> {
               print((prefs.getInt('penalty') ?? 0));
               if(_penalty != 0){
                 _penaltyController.text = _penalty.toString();
+                // change controller's cursor point
+                _penaltyController.selection = new TextSelection.fromPosition(
+                    new TextPosition(offset: _penaltyController.text.length));
               }
             }
           }
@@ -207,6 +219,9 @@ class _DetailViewState extends State<DetailView> {
               print((prefs.getString('receivedAccountNo') ?? "no account number"));
               if(_receivedAccountNo != "no account number"){
                 _accountNoController.text = _receivedAccountNo;
+                // change controller's cursor point
+                _accountNoController.selection = new TextSelection.fromPosition(
+                    new TextPosition(offset: _accountNoController.text.length));
               }
             }
             // bankName controller
@@ -222,6 +237,9 @@ class _DetailViewState extends State<DetailView> {
               print((prefs.getString('receivedBankName') ?? "은행명을 입력해주세요(한글)"));
               if(_receivedBankName != "은행명을 입력해주세요(한글)"){
                 _bankNameController.text = _receivedBankName;
+                // change controller's cursor point
+                _bankNameController.selection = new TextSelection.fromPosition(
+                    new TextPosition(offset: _bankNameController.text.length));
               }
             }
           }
@@ -290,7 +308,7 @@ class _DetailViewState extends State<DetailView> {
             width: _width * 0.9,
             height: _height * 0.2,
             decoration: _boxDecoration,
-            padding: EdgeInsets.all(15),
+            padding: EdgeInsets.all(18),
             child: penaltyView(),
           ),
         ],
@@ -301,7 +319,7 @@ class _DetailViewState extends State<DetailView> {
           Container(
             alignment: Alignment.topCenter,
             width: _width * 0.9,
-            height: _height * 0.24,
+            height: _height * 0.22,
             decoration: _boxDecoration,
             padding: EdgeInsets.all(15),
             child: receivingAccountView(),
@@ -336,7 +354,7 @@ class _DetailViewState extends State<DetailView> {
           child: Container(
             alignment: Alignment.centerRight,
             child: Text(
-              "우리은행",
+              "우리",
               style: _textStyle,
             ),
           ),
@@ -356,6 +374,10 @@ class _DetailViewState extends State<DetailView> {
   }
 
   Widget penaltyView() {
+    Size _size = MediaQuery.of(context).size;
+    double _width = _size.width;
+    double _height = _size.height;
+
     TextStyle _textStyle = TextStyle(
         fontFamily: "AppleSDGothicNeo",
         fontWeight: FontWeight.w400,
@@ -380,31 +402,35 @@ class _DetailViewState extends State<DetailView> {
           flex: 3,
           child: Container(
               child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: TextField(
-                  textAlign: TextAlign.right,
-                  controller: _penaltyController,
-                  style: _textStyle,
-                  decoration: InputDecoration.collapsed(
-                      hintText: "00000",
-                      hintStyle: _textStyle.copyWith(
-                        color: Color.fromARGB(150, 35, 37, 43),
-                      ),
-                      border: InputBorder.none),
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Flexible(
+                  child: Container(
+                    width: _width*0.23,
+                    child: TextField(
+                      controller: _penaltyController,
+                      textAlign: TextAlign.end,
+                      style: _textStyle,
+                      decoration: InputDecoration.collapsed(
+                          hintText: "00000",
+                          hintStyle: _textStyle.copyWith(
+                            color: Color.fromARGB(150, 35, 37, 43),
+                          ),
+                          border: InputBorder.none),
+                      cursorColor: Color.fromARGB(255, 35, 37, 43),
+                    ),
+                  ),
                 ),
-              ),
-              Container(
-                width: 23,
-                alignment: Alignment.centerRight,
-                child: Text(
-                  "₩",
-                  style: _textStyle,
-                ),
-              ),
-            ],
-          )),
+                Container(
+                  width: 23,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "₩",
+                    style: _textStyle,
+                  ),
+                )
+              ],
+            )),
         ),
         Expanded(
           flex: 1,
@@ -427,7 +453,7 @@ class _DetailViewState extends State<DetailView> {
     TextStyle _textStyle = TextStyle(
         fontFamily: "AppleSDGothicNeo",
         fontWeight: FontWeight.w400,
-        fontSize: 24,
+        fontSize: 28,
         color: Color.fromARGB(255, 35, 37, 43),
         shadows: [
           Shadow(
@@ -449,15 +475,16 @@ class _DetailViewState extends State<DetailView> {
             alignment: Alignment.centerRight,
             child: TextField(
               controller: _bankNameController,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.end,
               style: _textStyle,
               decoration: InputDecoration.collapsed(
-                hintText: '우리은행',
+                hintText: '우리',
                 hintStyle: _textStyle.copyWith(
                   color: Color.fromARGB(150, 35, 37, 43),
                 ),
-                  border: InputBorder.none
+                  border: InputBorder.none,
               ),
+              cursorColor: Color.fromARGB(255, 35, 37, 43),
             ),
           ),
         ),
@@ -467,7 +494,7 @@ class _DetailViewState extends State<DetailView> {
             alignment: Alignment.centerRight,
             child: TextField(
               controller: _accountNoController,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.end,
               style: _textStyle.copyWith(fontSize: 20),
               decoration: InputDecoration.collapsed(
                   hintText: '00000000000000000',
@@ -476,6 +503,7 @@ class _DetailViewState extends State<DetailView> {
                   ),
                   border: InputBorder.none
               ),
+              cursorColor: Color.fromARGB(255, 35, 37, 43),
             ),
           ),
         ),

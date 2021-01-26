@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'package:screen/screen.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 import 'package:alarm_with_bank_transfer/models/history_model.dart';
 import 'package:alarm_with_bank_transfer/history_helper.dart';
@@ -31,6 +34,8 @@ class _AlarmManagerState extends State<AlarmManager> {
   bool restart = false;
   bool ring = false;
   int miss = 0;
+  AudioPlayer audioPlayer;
+  AudioCache audioCache;
 
   final BoxDecoration _boxDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(20),
@@ -76,6 +81,9 @@ class _AlarmManagerState extends State<AlarmManager> {
     if(!restart){
       _alarmTime = widget.alarmTime;
     }
+    audioPlayer = new AudioPlayer();
+    audioPlayer.seek(Duration(seconds: 3));
+    audioCache = new AudioCache(fixedPlayer: audioPlayer);
     super.initState();
   }
 
@@ -148,13 +156,13 @@ class _AlarmManagerState extends State<AlarmManager> {
                     SharedPreferences prefs = await SharedPreferences.getInstance();
                     int _penalty = (prefs.getInt('penalty') ?? 0);
                     int _left = (prefs.getInt('left') ?? 0);
-                    _left += _penalty;
-                    prefs.setInt('left', _left);
                     History history = new History(
                       date: _alarmTime,
                       timeExceeded: _alarmTime.difference(widget.alarmTime).inMinutes,
                       penalty: _penalty * miss
                     );
+                    _left += (_penalty*miss);
+                    await prefs.setInt('left', _left);
                     await HistoryHelper().createHistory(history);
                   }
                   if(_timer != null){
@@ -268,7 +276,7 @@ class _AlarmManagerState extends State<AlarmManager> {
     }
 
     print("waiting");
-    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+    _timer = Timer.periodic(Duration(minutes: 1), (timer) async {
       print("restart");
       setState(() {
         _alarmTime = DateTime.now().add(Duration(minutes: 1));
@@ -280,16 +288,13 @@ class _AlarmManagerState extends State<AlarmManager> {
         _timer.cancel();
       });
     });
+    await AssetsAudioPlayer.newPlayer().open(
+      Audio("assets/sounds/beep.mp3"),
+      seek: Duration(minutes: 1),
+    );
     if (await Vibration.hasVibrator()) {
       print("vibration, ring");
       Vibration.vibrate(pattern: [2000, 2000, 4000, 4000, 4000, 6000, 4000, 8000, 2000, 8000, 2000, 4000, 5000, 3000, 2000, 2000]);
     }
-//    await SystemSound.play(SystemSoundType.click);
-
-//    pool = new Soundpool(streamType: StreamType.notification);
-//    int soundId = await rootBundle.load("sounds/dices.m4a").then((ByteData soundData) {
-//      return pool.load(soundData);
-//    });
-//    int streamId = await pool.play(soundId);
   }
 }

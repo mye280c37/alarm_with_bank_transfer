@@ -14,8 +14,9 @@ class ErrorDialog extends StatelessWidget {
     return AlertDialog(
         titlePadding: EdgeInsets.all(0),
         contentPadding: EdgeInsets.all(0),
+        backgroundColor: Color.fromARGB(255, 250, 249, 248),
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30.0))),
+            borderRadius: BorderRadius.all(Radius.circular(20.0))),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,

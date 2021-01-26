@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage>
     if(_leftPenalty == 0){
       print('there is no left penalty');
     }else{
-      Future.delayed(Duration(seconds: 10), (){
+      Future.delayed(Duration(seconds: 2), (){
         showDialog(context: context, builder: (BuildContext context)=>
             PenaltyDialog(bankName: _receivedBankName, accountNo: _receivedAccountNo, left: _leftPenalty)
         );
@@ -148,13 +148,16 @@ class PenaltyDialog extends StatefulWidget {
 }
 
 class _PenaltyDialogState extends State<PenaltyDialog> {
+  SharedPreferences prefs;
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
         titlePadding: EdgeInsets.all(0),
         contentPadding: EdgeInsets.all(0),
+        backgroundColor: Color.fromARGB(255, 250, 249, 248),
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30.0))),
+            borderRadius: BorderRadius.all(Radius.circular(20.0))),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
@@ -179,6 +182,9 @@ class _PenaltyDialogState extends State<PenaltyDialog> {
                     onTap: () async {
                       Navigator.of(context).pop();
                       if(widget.bankName != '은행명을 입력해주세요' && widget.accountNo != '00000000000000000'){
+                        prefs = await SharedPreferences.getInstance();
+                        await prefs.setInt('left', 0);
+                        print(prefs.getInt('left')??0);
                         var url = await openToss(widget.bankName, widget.accountNo, widget.left);
                         if(url != null){
                           if (await canLaunch(url)) {
@@ -201,8 +207,8 @@ class _PenaltyDialogState extends State<PenaltyDialog> {
                         "SEND",
                         style: TextStyle(
                           fontFamily: "AppleSDGothicNeo",
-                          fontWeight: FontWeight.w400,
-                          color: Color.fromARGB(255, 255, 139, 139),
+                          fontWeight: FontWeight.w600,
+                          color: Color.fromARGB(255, 255, 80, 80),
                           fontSize: 15,
                         ),
                       ),
