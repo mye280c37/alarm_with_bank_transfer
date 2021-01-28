@@ -36,8 +36,7 @@ dependencies:
   # alarm ring
   vibration: ^1.7.3
   screen: ^0.0.5
-  assets_audio_player: ^2.0.13+1
-  audioplayers: ^0.17.2
+  audioplayers: ^0.17.3
   # toss API
   http: ^0.12.2
   dio: ^3.0.10

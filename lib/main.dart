@@ -10,7 +10,6 @@ import 'package:alarm_with_bank_transfer/views/setting.dart';
 import 'package:alarm_with_bank_transfer/views/history.dart';
 import 'package:alarm_with_bank_transfer/views/dialog.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
@@ -62,15 +61,19 @@ class _MyHomePageState extends State<MyHomePage>
     print('check left penalty');
     prefs = await SharedPreferences.getInstance();
     _leftPenalty = prefs.getInt('left') ?? 0;
-    _receivedAccountNo = (prefs.getString('receivedAccountNo') ?? '00000000000000000');
+    _receivedAccountNo =
+        (prefs.getString('receivedAccountNo') ?? '00000000000000000');
     _receivedBankName = (prefs.getString('receivedBankName') ?? '은행명을 입력해주세요');
-    if(_leftPenalty == 0){
+    if (_leftPenalty == 0) {
       print('there is no left penalty');
-    }else{
-      Future.delayed(Duration(seconds: 2), (){
-        showDialog(context: context, builder: (BuildContext context)=>
-            PenaltyDialog(bankName: _receivedBankName, accountNo: _receivedAccountNo, left: _leftPenalty)
-        );
+    } else {
+      Future.delayed(Duration(seconds: 2), () {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) => PenaltyDialog(
+                bankName: _receivedBankName,
+                accountNo: _receivedAccountNo,
+                left: _leftPenalty));
       });
     }
 
@@ -85,10 +88,9 @@ class _MyHomePageState extends State<MyHomePage>
     double _width = _size.width;
     double _height = _size.height;
 
-    if(!ischecked){
+    if (!ischecked) {
       checkleftPenalty();
     }
-
 
     return DefaultTabController(
       length: 3,
@@ -135,14 +137,14 @@ class _MyHomePageState extends State<MyHomePage>
   }
 }
 
-
 class PenaltyDialog extends StatefulWidget {
   String bankName;
   String accountNo;
   int left;
-  
-  PenaltyDialog({@required this.bankName, @required this.accountNo, @required this.left});
-  
+
+  PenaltyDialog(
+      {@required this.bankName, @required this.accountNo, @required this.left});
+
   @override
   _PenaltyDialogState createState() => _PenaltyDialogState();
 }
@@ -165,42 +167,48 @@ class _PenaltyDialogState extends State<PenaltyDialog> {
             Container(
               alignment: Alignment.center,
               padding: EdgeInsets.only(bottom: 15, top: 20),
-              child: Text(
-                  "left penalty: ${widget.left}",
+              child: Text("left penalty: ${widget.left}",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontFamily: "AppleSDGothicNeo",
                       fontWeight: FontWeight.w500,
                       color: Colors.black87,
-                      fontSize: 18
-                  )
-              ),
+                      fontSize: 18)),
             ),
             Container(
                 height: 45,
                 child: GestureDetector(
                     onTap: () async {
                       Navigator.of(context).pop();
-                      if(widget.bankName != '은행명을 입력해주세요' && widget.accountNo != '00000000000000000'){
+                      if (widget.bankName != '은행명을 입력해주세요' &&
+                          widget.accountNo != '00000000000000000') {
                         prefs = await SharedPreferences.getInstance();
                         await prefs.setInt('left', 0);
-                        print(prefs.getInt('left')??0);
-                        var url = await openToss(widget.bankName, widget.accountNo, widget.left);
-                        if(url != null){
+                        print(prefs.getInt('left') ?? 0);
+                        var url = await openToss(
+                            widget.bankName, widget.accountNo, widget.left);
+                        if (url != null) {
                           if (await canLaunch(url)) {
-                            await launch(url, forceSafariVC: false, forceWebView: false);
+                            await launch(url,
+                                forceSafariVC: false, forceWebView: false);
                           }
                         }
-                      } else{
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailView(
-                            title: "Receiving Account", detailIndex: 1)));
-                        showDialog(context: context, builder: (BuildContext context)=>
-                            ErrorDialog(errorMsg: "fill received Account",)
-                        );
+                      } else {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DetailView(
+                                    title: "Receiving Account",
+                                    detailIndex: 1)));
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) => ErrorDialog(
+                                  errorMsg: "fill received Account",
+                                ));
                       }
                     },
                     child: Container(
-                      padding: EdgeInsets.only(right: 50, bottom: 10 ),
+                      padding: EdgeInsets.only(right: 50, bottom: 10),
                       alignment: Alignment.centerRight,
                       color: Colors.transparent,
                       child: Text(
@@ -212,11 +220,8 @@ class _PenaltyDialogState extends State<PenaltyDialog> {
                           fontSize: 15,
                         ),
                       ),
-                    )
-                )
-            ),
+                    ))),
           ],
-        )
-    );
+        ));
   }
 }
