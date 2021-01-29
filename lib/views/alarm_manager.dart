@@ -112,25 +112,25 @@ class _AlarmManagerState extends State<AlarmManager> {
             color: Color.fromARGB(255, 35, 37, 43),
           ),
           Positioned(
-            top: _height * 0.22,
+            top: _height * 0.2,
             child: Container(
-              width: _width * 0.9,
-              height: _width * 0.9,
+              width: _width * 0.83,
+              height: _width * 0.83,
               child: CircularProgressIndicator(
                 backgroundColor: Colors.black87,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   Color.fromARGB(255, 250, 249, 248),
                 ),
                 value: restTime,
-                strokeWidth: 2,
+                strokeWidth: 4.5,
               ),
             ),
           ),
           Positioned(
-            top: _height * 0.22,
+            top: _height * 0.2,
             child: Container(
-              width: _width * 0.9,
-              height: _width * 0.9,
+              width: _width * 0.83,
+              height: _width * 0.83,
               child: Center(
                 child: Text(
                   _targetTime,
