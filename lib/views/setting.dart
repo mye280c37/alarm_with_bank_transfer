@@ -133,8 +133,14 @@ class _DetailViewState extends State<DetailView> {
 
   @override
   void initState() {
-    prefsLoad = false;
     super.initState();
+    prefsLoad = false;
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
+    checkData();
   }
 
   Future<bool> loadData() async {
@@ -177,6 +183,60 @@ class _DetailViewState extends State<DetailView> {
         )
       ]);
 
+  void checkData() {
+    if(_detailIndex == 0){
+      if (_penaltyController.text.isEmpty) {
+        _scaffoldKey.currentState.showSnackBar(
+            SnackBar(content: Text("Enter price for your penalty.")));
+      } else {
+        _penalty = int.parse(_penaltyController.text);
+        print("penalty is changed: $_penalty");
+        prefs.setInt('penalty', _penalty);
+        print((prefs.getInt('penalty') ?? 0));
+        if(_penalty != 0){
+          _penaltyController.text = _penalty.toString();
+          // change controller's cursor point
+          _penaltyController.selection = new TextSelection.fromPosition(
+              new TextPosition(offset: _penaltyController.text.length));
+        }
+      }
+    }
+    else if(_detailIndex == 1){
+      // accountNo controller
+      if (_accountNoController.text.isEmpty) {
+        _scaffoldKey.currentState.showSnackBar(
+            SnackBar(content: Text("Enter received Account numbers.")));
+      } else {
+        _receivedAccountNo = _accountNoController.text;
+        print("AccountNo is changed: $_receivedAccountNo");
+        prefs.setString('receivedAccountNo', _receivedAccountNo);
+        print((prefs.getString('receivedAccountNo') ?? "no account number"));
+        if(_receivedAccountNo != "no account number"){
+          _accountNoController.text = _receivedAccountNo;
+          // change controller's cursor point
+          _accountNoController.selection = new TextSelection.fromPosition(
+              new TextPosition(offset: _accountNoController.text.length));
+        }
+      }
+      // bankName controller
+      if (_bankNameController.text.isEmpty) {
+        _scaffoldKey.currentState.showSnackBar(
+            SnackBar(content: Text("Enter received bank name.")));
+      } else {
+        _receivedBankName = _bankNameController.text;
+        print("Bank Name is changed: $_receivedBankName");
+        prefs.setString('receivedBankName', _receivedBankName);
+        print((prefs.getString('receivedBankName') ?? "은행명을 입력해주세요(한글)"));
+        if(_receivedBankName != "은행명을 입력해주세요(한글)"){
+          _bankNameController.text = _receivedBankName;
+          // change controller's cursor point
+          _bankNameController.selection = new TextSelection.fromPosition(
+              new TextPosition(offset: _bankNameController.text.length));
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size _size = MediaQuery.of(context).size;
@@ -184,65 +244,10 @@ class _DetailViewState extends State<DetailView> {
     double _height = _size.height;
 
     return GestureDetector(
-        onTap: () async {
+        onTap: () {
           FocusScope.of(context).unfocus();
-          if(_detailIndex == 0){
-            if (_penaltyController.text.isEmpty) {
-              _scaffoldKey.currentState.showSnackBar(
-                  SnackBar(content: Text("Enter price for your penalty.")));
-            } else {
-              setState(() {
-                _penalty = int.parse(_penaltyController.text);
-                print("penalty is changed: $_penalty");
-              });
-              prefs.setInt('penalty', _penalty);
-              print((prefs.getInt('penalty') ?? 0));
-              if(_penalty != 0){
-                _penaltyController.text = _penalty.toString();
-                // change controller's cursor point
-                _penaltyController.selection = new TextSelection.fromPosition(
-                    new TextPosition(offset: _penaltyController.text.length));
-              }
-            }
-          }
-          else if(_detailIndex == 1){
-            // accountNo controller
-            if (_accountNoController.text.isEmpty) {
-              _scaffoldKey.currentState.showSnackBar(
-                  SnackBar(content: Text("Enter received Account numbers.")));
-            } else {
-              setState(() {
-                _receivedAccountNo = _accountNoController.text;
-                print("AccountNo is changed: $_receivedAccountNo");
-              });
-              prefs.setString('receivedAccountNo', _receivedAccountNo);
-              print((prefs.getString('receivedAccountNo') ?? "no account number"));
-              if(_receivedAccountNo != "no account number"){
-                _accountNoController.text = _receivedAccountNo;
-                // change controller's cursor point
-                _accountNoController.selection = new TextSelection.fromPosition(
-                    new TextPosition(offset: _accountNoController.text.length));
-              }
-            }
-            // bankName controller
-            if (_bankNameController.text.isEmpty) {
-              _scaffoldKey.currentState.showSnackBar(
-                  SnackBar(content: Text("Enter received bank name.")));
-            } else {
-              setState(() {
-                _receivedBankName = _bankNameController.text;
-                print("Bank Name is changed: $_receivedBankName");
-              });
-              prefs.setString('receivedBankName', _receivedBankName);
-              print((prefs.getString('receivedBankName') ?? "은행명을 입력해주세요(한글)"));
-              if(_receivedBankName != "은행명을 입력해주세요(한글)"){
-                _bankNameController.text = _receivedBankName;
-                // change controller's cursor point
-                _bankNameController.selection = new TextSelection.fromPosition(
-                    new TextPosition(offset: _bankNameController.text.length));
-              }
-            }
-          }
+          checkData();
+          setState(() {});
         },
         child: Scaffold(
           resizeToAvoidBottomInset: false,
@@ -329,50 +334,6 @@ class _DetailViewState extends State<DetailView> {
     }
   }
 
-  Widget myAccountView() {
-    TextStyle _textStyle = TextStyle(
-        fontFamily: "AppleSDGothicNeo",
-        fontWeight: FontWeight.w400,
-        fontSize: 24,
-        color: Color.fromARGB(255, 35, 37, 43),
-        shadows: [
-          Shadow(
-            blurRadius: 5.0,
-            color: Colors.black.withOpacity(.3),
-            offset: Offset(1.0, 1.0),
-          )
-        ]);
-
-    return Column(
-      children: [
-        Expanded(
-          flex: 2,
-          child: Container(),
-        ),
-        Expanded(
-          flex: 1,
-          child: Container(
-            alignment: Alignment.centerRight,
-            child: Text(
-              "우리",
-              style: _textStyle,
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: Container(
-            alignment: Alignment.centerRight,
-            child: Text(
-              "01234522312345667",
-              style: _textStyle.copyWith(fontSize: 18),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget penaltyView() {
     Size _size = MediaQuery.of(context).size;
     double _width = _size.width;
@@ -418,6 +379,20 @@ class _DetailViewState extends State<DetailView> {
                           ),
                           border: InputBorder.none),
                       cursorColor: Color.fromARGB(255, 35, 37, 43),
+                      onSubmitted: (String value){
+                        setState(() {
+                          _penalty = int.parse(value);
+                          print("penalty is changed: $_penalty");
+                        });
+                        prefs.setInt('penalty', _penalty);
+                        print((prefs.getInt('penalty') ?? 0));
+                        if(_penalty != 0){
+                          _penaltyController.text = _penalty.toString();
+                          // change controller's cursor point
+                          _penaltyController.selection = new TextSelection.fromPosition(
+                              new TextPosition(offset: _penaltyController.text.length));
+                        }
+                      },
                     ),
                   ),
                 ),
@@ -453,7 +428,7 @@ class _DetailViewState extends State<DetailView> {
     TextStyle _textStyle = TextStyle(
         fontFamily: "AppleSDGothicNeo",
         fontWeight: FontWeight.w400,
-        fontSize: 28,
+        fontSize: 26,
         color: Color.fromARGB(255, 35, 37, 43),
         shadows: [
           Shadow(
@@ -466,11 +441,11 @@ class _DetailViewState extends State<DetailView> {
     return Column(
       children: [
         Expanded(
-          flex: 2,
+          flex: 3,
           child: Container(),
         ),
         Expanded(
-          flex: 1,
+          flex: 2,
           child: Container(
             alignment: Alignment.centerRight,
             child: TextField(
@@ -485,6 +460,20 @@ class _DetailViewState extends State<DetailView> {
                   border: InputBorder.none,
               ),
               cursorColor: Color.fromARGB(255, 35, 37, 43),
+              onSubmitted: (String value){
+                setState(() {
+                  _receivedBankName = _bankNameController.text;
+                  print("Bank Name is changed: $_receivedBankName");
+                });
+                prefs.setString('receivedBankName', _receivedBankName);
+                print((prefs.getString('receivedBankName') ?? "은행명을 입력해주세요(한글)"));
+                if(_receivedBankName != "은행명을 입력해주세요(한글)"){
+                  _bankNameController.text = _receivedBankName;
+                  // change controller's cursor point
+                  _bankNameController.selection = new TextSelection.fromPosition(
+                      new TextPosition(offset: _bankNameController.text.length));
+                }
+              },
             ),
           ),
         ),
@@ -504,6 +493,20 @@ class _DetailViewState extends State<DetailView> {
                   border: InputBorder.none
               ),
               cursorColor: Color.fromARGB(255, 35, 37, 43),
+              onSubmitted: (String value){
+                setState(() {
+                  _receivedAccountNo = value;
+                  print("AccountNo is changed: $_receivedAccountNo");
+                });
+                prefs.setString('receivedAccountNo', _receivedAccountNo);
+                print((prefs.getString('receivedAccountNo') ?? "no account number"));
+                if(_receivedAccountNo != "no account number"){
+                  _accountNoController.text = _receivedAccountNo;
+                  // change controller's cursor point
+                  _accountNoController.selection = new TextSelection.fromPosition(
+                      new TextPosition(offset: _accountNoController.text.length));
+                }
+              },
             ),
           ),
         ),
